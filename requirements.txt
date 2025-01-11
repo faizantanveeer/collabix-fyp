@@ -1,0 +1,8 @@
+mongoose
+express
+dotenv
+cookie-parser
+jsonwebtoken
+bcrypt
+multer
+cloudinary
