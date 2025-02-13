@@ -16,50 +16,47 @@ const authOptions: NextAuthOptions = {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(credentials),
           });
-      
+
           const user = await res.json();
-          console.log("Backend User Response:", user);  // Log the user response from backend
-      
-          if (!res.ok) throw new Error(user.error || "Invalid credentials");
-      
-          return user ? { id: user.id, email: user.email, token: user.token } : null;
+
+          if (!res.ok || !user.id) {
+            console.error("Auth Error:", user.message || "Invalid credentials");
+            return null;
+          }
+
+          // console.log('User:', user);
+          return user; // Ensure user object includes `role`
         } catch (error) {
           console.error("Auth Error:", error);
           return null;
         }
-      }
-      ,
+      },
     }),
   ],
   pages: {
-    signIn: "/login", // Customize the route for the login page
-    error: "/auth/error", // Customize the route for handling errors
+    signIn: "/login",
+    error: "/auth/error",
   },
   session: {
-    strategy: "jwt", // Use JWT for stateless authentication
-    maxAge: 24 * 60 * 60, // Set session expiry if required
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user }) {
-        if (user) {
-         
-          token.id = user.id;
-          token.email = user.email;
-          token.token = user.token;
-        }
-        
-        return token;
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.role = user.role; // ✅ Store role in token
       }
-      ,
-      async session({ session, token }) {
-    
-        session.user = token;  // Attach the user data from the token to the session
-    
-        return session;
-      },
-  },
-  redirect: async (url, baseUrl) => {
-    return baseUrl + "/dashboard"; // Customize the redirect after successful login
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.id as string;
+      session.user.email = token.email as string;
+      session.user.role = token.role as string; // ✅ Add role to session
+      // console.log("Session:", session);
+      return session;
+    },
   },
 };
 

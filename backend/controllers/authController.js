@@ -17,14 +17,10 @@ const loginHandler = async (req, res) => {
     const isMatch = await bcrypt.compare(password, loginUser.password);
 
     if (!isMatch) {
-      return res.status(400).send("Incorrect Email/Password!");
+      return res.status(400).json({message: "Incorrect Email/Password!"});
     }
 
-    const token = jwt.sign({ email: loginUser.email }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-    
-    return res.json({ token});  // Send the token back to the frontend as JSON
+      res.json({ id: loginUser._id, email: loginUser.email, name: loginUser.name , role: loginUser.role});
 
   } catch (error) {
     console.log(error);
@@ -35,34 +31,38 @@ const loginHandler = async (req, res) => {
 
 
 const signupHandler = async (req, res) => {
-  const { name, email, password, role } = req.body;
+
+  const { name, email, password, role, influencerDetails, businessDetails } = req.body;
+
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
   try {
-    bcrypt.genSalt(10, function (err, salt) {
-      bcrypt.hash(password, salt, async function (err, hash) {
-        const createdUser = await new userModel({
-          name,
-          email,
-          password: hash,
-          role,
-        });
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) return res.status(400).json({ error: "User already exists" });
 
-        const token = jwt.sign({ email }, process.env.JWT_SECRET, {
-          expiresIn: "1d",
-        });
-
-        console.log(token);
-
-        await createdUser.save();
-
-        res.cookie("token", token);
-
-        res.send("Successfully Created User");
-      });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new userModel({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      ...(role === "influencer" && { influencerDetails }),
+      ...(role === "business" && { businessDetails }),
     });
+
+    await newUser.save();
+    res.status(201).json({ message: "User created successfully" });
   } catch (err) {
-    console.log(err);
+    console.error("Signup Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
+module.exports = signupHandler;
+
 
 const logoutHandler = (req, res) => {
   res.cookie("authToken", "");

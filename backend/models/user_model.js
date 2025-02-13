@@ -1,15 +1,23 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const db = require('../config/db')
+const mongoose = require("mongoose");
 
-
-const userSchema = new Schema({
-  name: String,
-  email: String,
-  password: String, // Hashed
-  role: { type: String, enum: ["Business", "Influencer"], required: true },
-  profileDetails: { type: mongoose.Schema.Types.Mixed },
-  createdAt: { type: Date, default: Date.now },
-});
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: ["business", "influencer"], required: true },
+    influencerDetails: {
+      socialLinks: [{ type: String }],
+      followerCount: { type: Number },
+      category: { type: String },
+    },
+    businessDetails: {
+      companyName: { type: String },
+      website: { type: String },
+      industry: { type: String },
+    },
+  },
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("User", userSchema);

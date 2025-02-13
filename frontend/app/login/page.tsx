@@ -30,7 +30,7 @@ export default function Login() {
       });
   
       if (res?.error) {
-        setError('Login failed. Please check your credentials.');
+        setError('Wrong email/password');
       } else {
         console.log("Login successful:", res);
         window.location.href = '/';  // Redirect to the dashboard after login
@@ -72,7 +72,7 @@ export default function Login() {
               placeholder="Enter your password"
             />
           </div>
-          <Button type="submit" className="w-full py-2" onClick={() => signIn("credentials")}>Login</Button>
+          <Button type="submit" className="w-full py-2">Login</Button>
 
         </form>
 
