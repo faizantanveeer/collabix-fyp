@@ -1,19 +1,29 @@
 const jwt = require("jsonwebtoken");
 
-const verifyToken = (req, res, next) => {
-  const token = req.cookies.authToken;    // ✅ Read from cookies
+const isLoggedIn = (req, res, next) => {
+    let token = req.cookies.token; // First check cookies
 
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized: No token provided" });
-  }
+    // If token not in cookies, check Authorization header
+    if (!token && req.headers.authorization) {
+        const authHeader = req.headers.authorization.split(" ");
+        if (authHeader[0] === "Bearer" && authHeader[1]) {
+            token = authHeader[1]; // Extract token from Bearer token
+        }
+    }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: "Unauthorized: Invalid token" });
-  }
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized access. No token provided." });
+    }
+
+    // console.log("Received Token:", token);
+
+    try {
+        const verified = jwt.verify(token.trim(), process.env.JWT_SECRET);
+        req.user = verified; // Attach decoded user to req.user
+        next();
+    } catch (err) {
+        return res.status(403).json({ message: "Invalid or expired token" });
+    }
 };
 
-module.exports = verifyToken;
+module.exports = isLoggedIn;

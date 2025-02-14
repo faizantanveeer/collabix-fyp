@@ -1,5 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
+import Cookies from "js-cookie";
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -15,6 +16,7 @@ const authOptions: NextAuthOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(credentials),
+            credentials: "include", // ✅ Allows sending/receiving cookies  
           });
 
           const user = await res.json();
@@ -24,7 +26,19 @@ const authOptions: NextAuthOptions = {
             return null;
           }
 
+          // console.log("Login response:", user); 
+
+           // ✅ Store the token in cookies
+          Cookies.set("token", user.token, {
+            expires: 7, // Expires in 7 days
+            secure: true, // Set to true in production (HTTPS)
+            sameSite: "Strict",
+            path: "/", // Available on all pages
+          });
+
+
           // console.log('User:', user);
+          // console.log('User Token from Backend:', user.token);
           return user; // Ensure user object includes `role`
         } catch (error) {
           console.error("Auth Error:", error);
@@ -34,8 +48,7 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: "/login",
-    error: "/auth/error",
+    signIn: "/login"
   },
   session: {
     strategy: "jwt",
@@ -46,14 +59,17 @@ const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.role = user.role; // ✅ Store role in token
+        token.role = user.role;
+        token.accessToken = user.token || undefined; 
       }
       return token;
     },
     async session({ session, token }) {
       session.user.id = token.id as string;
       session.user.email = token.email as string;
-      session.user.role = token.role as string; // ✅ Add role to session
+      session.user.role = token.role as string;
+      session.accessToken = token.accessToken || undefined;
+
       // console.log("Session:", session);
       return session;
     },

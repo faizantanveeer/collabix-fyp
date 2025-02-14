@@ -58,18 +58,22 @@ export default function Login() {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <Input
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
+              
             />
           </div>
           <div className="mb-4">
             <Input
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
+              
             />
           </div>
           <Button type="submit" className="w-full py-2">Login</Button>

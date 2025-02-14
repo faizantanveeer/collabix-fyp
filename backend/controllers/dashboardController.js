@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const isLoggedIn = require('../middleware/isLoggedIn');
+
 const userModel = require('../models/user_model'); // Add this import if necessary
 
 
