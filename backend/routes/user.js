@@ -1,9 +1,23 @@
 const express = require("express");
-const { getUserProfile } = require("../controllers/userController");
-const isLoggedn = require("../middleware/isLoggedIn"); // ✅ Ensure this is correct
-
 const router = express.Router();
+const {
+  getUserProfile,
+  updateProfile,
+  updatePaymentMethods,
+  deleteUserAccount, // Ensure this is imported
+} = require("../controllers/userController");
+const isLoggedIn = require("../middleware/isLoggedIn");
 
-router.get("/profile", isLoggedn, getUserProfile); // ✅ Correct usage
+// Get user profile
+router.get("/profile", isLoggedIn, getUserProfile);
+
+// Update user profile
+router.put("/profile", isLoggedIn, updateProfile);
+
+// Update payment methods
+router.put("/payment-methods", isLoggedIn, updatePaymentMethods);
+
+// Delete user account
+router.delete("/delete", isLoggedIn, deleteUserAccount); // Ensure this is defined
 
 module.exports = router;

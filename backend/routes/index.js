@@ -1,29 +1,29 @@
-var express = require('express');
-const authenticateUser = require('../middleware/isLoggedIn');
-var router = express.Router();
-var authRouter = require('./auth');
+const express = require("express");
+const authenticateUser = require("../middleware/isLoggedIn");
+const router = express.Router();
+
+// Import route handlers
+const authRouter = require("./auth");
 const userRoutes = require("./user");
-const { dashboardHandler } = require('../controllers/dashboardController');
+const { dashboardHandler } = require("../controllers/dashboardController");
 
-
-
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Collabix' });
+// Home route
+router.get("/", (req, res) => {
+  res.render("index", { title: "Collabix" });
 });
 
-router.get('/home', function(req, res){
-  res.render('home.ejs')
-})
+// Home page route
+router.get("/home", (req, res) => {
+  res.render("home.ejs");
+});
 
-router.get('/dashboard', dashboardHandler) 
+// Dashboard route (protected by authentication)
+router.get("/dashboard", authenticateUser, dashboardHandler);
 
-router.use('/auth', authRouter);
+// Authentication routes
+router.use("/auth", authRouter);
 
-router.use("/user", userRoutes);
-
-
-
+// User-related routes
+router.use("/user", authenticateUser, userRoutes);
 
 module.exports = router;
-
-

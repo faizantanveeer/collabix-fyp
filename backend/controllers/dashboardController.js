@@ -1,35 +1,91 @@
-var express = require("express");
-var router = express.Router();
+const User = require("../models/user_model");
+const Collaboration = require("../models/collaboration_model");
+const Payment = require("../models/payment_model");
+const Message = require("../models/message_model");
+const Notification = require("../models/notification_model");
 
-const userModel = require('../models/user_model'); // Add this import if necessary
-
-
+// Get dashboard data based on user role
 const dashboardHandler = async (req, res) => {
   try {
-    // Check if req.user is available (this should come from the isLoggedIn middleware)
-    if (!req.user) {
-      return res.status(400).send('User not authenticated');
-    }
-
-    // Fetch the user from the database
-    const user = await userModel.findOne({ email: req.user.email });
-    
+    const user = await User.findById(req.user.id).select("-password");
     if (!user) {
-      return res.status(404).send('User not found');
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Send the user data as response
-    res.json({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      // Add any other data you want to send to the frontend
-    });
+    let dashboardData = {};
+
+    const { role, _id } = user;
+
+    // Fetch common data like messages and notifications
+    const messagesPromise = Message.find({ receiver: _id })
+      .populate("sender", "name")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    const notificationsPromise = Notification.find({ recipient: _id, isRead: false })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    let collaborationsPromise, paymentsPromise;
+    if (role === "influencer") {
+      // Fetch influencer-specific data
+      collaborationsPromise = Collaboration.find({ influencer: _id })
+        .populate("business", "name")
+        .exec();
+
+      paymentsPromise = Payment.find({ payee: _id });
+    } else if (role === "business") {
+      // Fetch business-specific data
+      collaborationsPromise = Collaboration.find({ business: _id })
+        .populate("influencer", "name")
+        .exec();
+
+      paymentsPromise = Payment.find({ payer: _id });
+    }
+
+    // Wait for all data fetching
+    const [collaborations, payments, messages, notifications] = await Promise.all([
+      collaborationsPromise,
+      paymentsPromise,
+      messagesPromise,
+      notificationsPromise,
+    ]);
+
+    const pendingCollaborations = collaborations.filter((c) => c.status === "pending");
+    const activeCollaborations = collaborations.filter((c) => c.status === "accepted");
+    const completedCollaborations = collaborations.filter((c) => c.status === "completed");
+
+    dashboardData = {
+      profile: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        niche: user.niche,
+        bio: user.bio,
+        location: user.location,
+        profileImage: user.profileImage,
+        socialLinks: user.socialLinks,
+        totalFollowers: user.totalFollowers || 0, // Default to 0 if not set
+        averageRating: user.averageRating || 0, // Default to 0 if not set
+        companyName: user.businessDetails?.companyName || "N/A",
+        industry: user.businessDetails?.industry || "N/A",
+        website: user.businessDetails?.website || "N/A",
+      },
+      collaborations: {
+        pending: pendingCollaborations,
+        active: activeCollaborations,
+        completed: completedCollaborations,
+      },
+      payments,
+      messages,
+      notifications,
+      paymentMethods: role === "influencer" ? user.influencerDetails?.paymentMethods : user.businessDetails?.paymentMethods || [],
+    };
+
+    res.json(dashboardData);
   } catch (error) {
-    // Log the error message and stack trace for debugging
-    console.error('Error fetching user data:', error.message);
-    console.error(error.stack);
-    res.status(500).send('Server error');
+    console.error("Dashboard Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
