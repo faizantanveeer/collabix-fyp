@@ -43,6 +43,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/uploads', express.static('uploads'));
 
 // Register routes
 app.use("/", indexRouter);
@@ -51,14 +52,6 @@ app.use("/", indexRouter);
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: { origin: "*" },
-});
-
-io.on("connection", (socket) => {
-  console.log(`New client connected: ${socket.id}`);
-
-  socket.on("disconnect", () => {
-      console.log(`User disconnected: ${socket.id}`);
-  });
 });
 
 // Attach socket.io instance to requests

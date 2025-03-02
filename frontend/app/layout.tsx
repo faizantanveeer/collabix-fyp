@@ -1,9 +1,10 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "@/components/ui/sonner";
 import "../styles/globals.css"; // Import global styles
-import { NotificationProvider } from "../components/Notification";
-import { SocketProvider } from "../context/socketContext";
+
+
 
 export default function RootLayout({
   children,
@@ -15,9 +16,9 @@ export default function RootLayout({
       <body>
         {/* Wrap the entire app with authentication and notifications */}
         <SessionProvider>
-          <SocketProvider>
-            <NotificationProvider>{children}</NotificationProvider>
-          </SocketProvider>
+          
+            {children} <Toaster richColors position="top-center" /> 
+          
         </SessionProvider>
       </body>
     </html>

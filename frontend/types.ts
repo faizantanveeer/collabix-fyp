@@ -15,6 +15,7 @@ export interface UserData {
   paymentMethods: any[];
   payments: any[];
   profile: {
+    id: string;
     averageRating: number;
     companyName: string;
     email: string;

@@ -19,7 +19,7 @@ const collaborationSchema = new mongoose.Schema(
     },
     status: { 
       type: String, 
-      enum: ['pending', 'accepted', 'declined', 'completed'], 
+      enum: ['pending', 'accepted', 'rejected', 'completed'], 
       default: 'pending' 
     },
     startDate: { 
@@ -29,21 +29,23 @@ const collaborationSchema = new mongoose.Schema(
       type: Date 
     },
     budget: { 
-      type: Number 
+      type: Number, 
+      required: true 
     },
     description: { 
-      type: String 
+      type: String,
+      required: true
     },
     deliverables: { 
-      type: String 
+      type: String,
+      required: true
     },
+    file: {
+      type: String, // This will store the file path
+      default: null,
+    }
   },
   { timestamps: true }  // Automatically add createdAt and updatedAt fields
 );
-
-// Optionally, create indexes for faster querying
-collaborationSchema.index({ business: 1 });
-collaborationSchema.index({ influencer: 1 });
-collaborationSchema.index({ status: 1 });
 
 module.exports = mongoose.model('Collaboration', collaborationSchema);

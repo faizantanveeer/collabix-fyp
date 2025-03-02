@@ -65,6 +65,7 @@ const dashboardHandler = async (req, res) => {
 
     dashboardData = {
       profile: {
+        id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import InfluencerDashboard from "../dashboard/influencer/page";
 import BusinessDashboard from "../dashboard/business/page";
-import { UserData } from "../types";  // Import instead of local interface
+import { UserData } from "../../types";
 import Navbar from "@/components/Navbar";
 
 export default function Dashboard() {
@@ -25,33 +25,32 @@ export default function Dashboard() {
       credentials: "include", // Send cookies automatically
     });
 
-
     const data = await res.json();
-    console.log("User Data:", data.profile.name);
-    console.log(userData);
-
+    
+    // console.log(userData);
 
 
     setUserData(data);
-
   };
 
   useEffect(() => {
-    
-    
     if (status === "loading") return; // Wait for session to load
     if (!session?.user) {
       router.push("/login");
     }
-    
+
     if (status === "authenticated") {
       fetchUserProfile();
-      console.log("Session:", session);
+      // console.log("Session:", session);
     }
   }, [session, status, router]);
 
   if (status === "loading") {
-    return <div className="flex items-center justify-center h-screen text-xl">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen text-xl">
+        Loading...
+      </div>
+    );
   }
 
   if (!session?.user) return null; // Avoid rendering if user is not logged in
@@ -60,10 +59,10 @@ export default function Dashboard() {
   const userRole = session.user.role?.toLowerCase();
 
   return (
-    <div className="">
+    <div className="h-full">
+      <Navbar />
 
-      <Navbar/>
-      
+      {/* <InfluencerDashboard userData={userData} /> */}
       {userRole === "influencer" ? (
         <InfluencerDashboard userData={userData} />
       ) : userRole === "business" ? (
@@ -71,16 +70,6 @@ export default function Dashboard() {
       ) : (
         <UnknownRole />
       )}
-    </div>
-  );
-}
-
-
-function UnknownRole() {
-  return (
-    <div className="mt-4">
-      <h2 className="text-lg font-semibold">Unknown Role</h2>
-      <p>Please contact support if this is incorrect.</p>
     </div>
   );
 }

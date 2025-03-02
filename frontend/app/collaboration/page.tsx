@@ -1,10 +1,11 @@
 "use client";
-
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -15,49 +16,24 @@ import {
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
-import { toast } from "sonner"; // Notifications
-import { useSearchParams } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
-type CollaborationType = {
-  [key: string]: { title: string; desc: string };
+const collaborationTypes = {
+  "sponsored-post": "An influencer will create a dedicated post for your brand.",
+  "product-review": "The influencer will review your product with honest feedback.",
+  shoutout: "A quick mention in an influencer's post/story.",
+  "brand-ambassador": "A long-term collaboration with the influencer for brand awareness.",
 };
-
-const collaborationTypes: CollaborationType = {
-  "sponsored-post": {
-    title: "Sponsored Post",
-    desc: "An influencer will create a dedicated post for your brand.",
-  },
-  "product-review": {
-    title: "Product Review",
-    desc: "The influencer will review your product with honest feedback.",
-  },
-  shoutout: {
-    title: "Shoutout",
-    desc: "A quick mention in an influencer's post/story.",
-  },
-  "brand-ambassador": {
-    title: "Brand Ambassador",
-    desc: "A long-term collaboration with the influencer for brand awareness.",
-  },
-};
-
-interface CollaborationForm {
-  budget: string;
-  description: string;
-  deliverables: string;
-  deadline: string;
-  collaborationType: string;
-  file: File | null;
-}
 
 export default function Collaborate() {
+  const { data: session } = useSession();
   const params = useSearchParams();
-  const id = params.get("id")
-  const [influencer, setInfluencer] = useState(null);
+  const id = params.get("id");
 
+  const [influencer, setInfluencer] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [form, setForm] = useState<CollaborationForm>({
+  const [form, setForm] = useState({
     budget: "",
     description: "",
     deliverables: "",
@@ -67,208 +43,178 @@ export default function Collaborate() {
   });
 
   useEffect(() => {
-    const fetchInfluencer = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/influencers/${id}`
-        );
-        const data = await response.json();
-        setInfluencer(data);
-        console.log(influencer)
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching influencer:", error);
-        setLoading(false);
-      }
-    };
+    if (!id) return;
 
-    fetchInfluencer();
-  }, []);
+    setLoading(true);
+    fetch(`http://localhost:5000/influencers/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch influencer");
+        return res.json();
+      })
+      .then(setInfluencer)
+      .catch(() => toast.error("Error fetching influencer"))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) =>
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSelectChange = (value: string) => {
-    setForm({ ...form, collaborationType: value });
-  };
+  const handleSelectChange = (value) =>
+    setForm((prev) => ({ ...prev, collaborationType: value }));
 
+  const handleFileChange = (e) =>
+    setForm((prev) => ({ ...prev, file: e.target.files?.[0] || null }));
 
-  
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, file: e.target.files ? e.target.files[0] : null });
-  };
+  const isFormValid = Object.values(form).every((value) => value);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    if (
-      !form.budget ||
-      !form.description ||
-      !form.deliverables ||
-      !form.deadline
-    ) {
-      return toast.error("Please fill all required fields!");
+
+    const { budget, description, deliverables, deadline, collaborationType, file } = form;
+
+    if (!budget || !description || !deliverables || !deadline || !collaborationType) {
+      toast.error("Please fill all required fields!");
+      return;
     }
 
-    toast.success("Collaboration request submitted!");
-  };
+    // Retrieve stored requests from sessionStorage
+    const storedRequests = JSON.parse(sessionStorage.getItem("sentRequests") || "[]");
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
-  if (!influencer)
-    return (
-      <p className="text-center mt-10 text-red-500">Influencer not found!</p>
+    // Check if a duplicate request exists
+    const duplicateRequest = storedRequests.some(
+      (req) =>
+        req.influencer === id &&
+        req.budget === budget &&
+        req.description === description &&
+        req.deliverables === deliverables &&
+        req.deadline === deadline &&
+        req.collaborationType === collaborationType
     );
 
+    if (duplicateRequest) {
+      toast.error("You have already sent this collaboration request!");
+      return;
+    }
+
+    const formData = new FormData();
+    if (session?.user?.id) {
+      formData.append("business", session.user.id);
+      formData.append("influencer", id || "");
+      formData.append("campaign", collaborationType);
+      formData.append("budget", budget);
+      formData.append("description", description);
+      formData.append("deliverables", deliverables);
+      formData.append("deadline", deadline);
+      if (file) formData.append("file", file);
+    } else {
+      toast.error("User session not found!");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/collaboration/create", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.isDuplicate) {
+        toast.error("Duplicate Request Detected!");
+      } else {
+        const newRequest = { influencer: id, budget, description, deliverables, deadline, collaborationType };
+        sessionStorage.setItem("sentRequests", JSON.stringify([...storedRequests, newRequest]));
+        toast.success("Request Sent Successfully");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }, [form, id, session]);
+
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (!influencer) return <p className="text-center mt-10 text-red-500">Influencer not found!</p>;
+
   return (
-    <div className="max-w-5xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Left Side - Form Inputs */}
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4">Send Collaboration Request</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Collaboration Type */}
-          <div>
-            <Label>Collaboration Type</Label>
-            <Select
-              defaultValue="sponsored-post"
-              onValueChange={handleSelectChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.keys(collaborationTypes).map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {collaborationTypes[type].title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Budget */}
-          <div>
-            <Label>Estimated Budget (PKR)</Label>
-            <Input
-              type="number"
-              name="budget"
-              value={form.budget}
-              onChange={handleChange}
-              placeholder="Enter your budget"
+    <>
+      <Navbar />
+      <div className="max-w-5xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h1 className="text-2xl font-bold mb-4">Send Collaboration Request</h1>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label>Collaboration Type</Label>
+              <Select defaultValue="sponsored-post" onValueChange={handleSelectChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(collaborationTypes).map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type.replace("-", " ")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Input type="number" name="budget" placeholder="Budget (PKR)" value={form.budget} onChange={handleChange} />
+            <Textarea name="deliverables" placeholder="Expected Deliverables" value={form.deliverables} onChange={handleChange} />
+            <Input type="date" name="deadline" value={form.deadline} onChange={handleChange} />
+            <Textarea name="description" placeholder="Project Description" value={form.description} onChange={handleChange} />
+            <Input type="file" accept=".pdf,.docx,.png,.jpg" onChange={handleFileChange} />
+            <Button type="submit" className="w-full mt-4">
+              Submit Request
+            </Button>
+          </form>
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <Card className="p-4 flex items-center space-x-4">
+            <Image
+              src={influencer?.image || "/images/placeholder.jpg"}
+              alt={influencer?.name || "Influencer"}
+              width={80}
+              height={80}
+              className="rounded-full border"
             />
-          </div>
-
-          {/* Deliverables */}
-          <div>
-            <Label>Expected Deliverables</Label>
-            <Textarea
-              name="deliverables"
-              value={form.deliverables}
-              onChange={handleChange}
-              placeholder="E.g., Instagram post, YouTube video, etc."
-            />
-          </div>
-
-          {/* Deadline */}
-          <div>
-            <Label>Deadline</Label>
-            <Input
-              type="date"
-              name="deadline"
-              value={form.deadline}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <Label>Project Description</Label>
-            <Textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              placeholder="Describe the collaboration idea..."
-            />
-          </div>
-
-          {/* File Upload */}
-          <div>
-            <Label>Attach Brief (Optional)</Label>
-            <Input
-              type="file"
-              accept=".pdf,.docx,.png,.jpg"
-              onChange={handleFileChange}
-            />
-          </div>
-
-          {/* Submit Button */}
-          <Button type="submit" className="w-full mt-4">
-            Submit Collaboration Request
-          </Button>
-        </form>
-      </div>
-
-      {/* Right Side - Dynamic Preview */}
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        {/* Influencer Info */}
-        <Card className="p-4 flex items-center space-x-4">
-          <Image
-            src={influencer.image || "/images/placeholder.jpg"}
-            alt={influencer.name}
-            width={80}
-            height={80}
-            className="rounded-full border"
-          />
-          <div>
-            <h2 className="text-xl font-semibold">{influencer.name}</h2>
-            <p className="text-gray-500">{influencer.niche}</p>
-            <p className="text-blue-500 font-bold">
-            Followers: {influencer.influencerDetails.followerCount} 
+            <div>
+              <h2 className="text-xl font-semibold">{influencer.name}</h2>
+              <p className="text-gray-500">{influencer.niche}</p>
+              <p className="text-blue-500 font-bold">
+                Followers: {influencer.influencerDetails.followerCount}
+              </p>
+            </div>
+          </Card>
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold">📌 Collaboration Type</h2>
+            <p className="text-gray-700">
+              {collaborationTypes[form.collaborationType]}
             </p>
           </div>
-        </Card>
-
-        {/* Collaboration Type Preview */}
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold">📌 Collaboration Type</h2>
-          <p className="text-gray-700">
-            {collaborationTypes[form.collaborationType].desc}
-          </p>
-        </div>
-
-        {/* Budget Preview */}
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold">💰 Budget</h2>
-          <p className="text-gray-700">
-            {form.budget ? `PKR ${form.budget}` : "Not specified yet"}
-          </p>
-        </div>
-
-        {/* Deliverables Preview */}
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold">📦 Expected Deliverables</h2>
-          <p className="text-gray-700">
-            {form.deliverables || "Not specified yet"}
-          </p>
-        </div>
-
-        {/* Deadline Preview */}
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold">📅 Deadline</h2>
-          <p className="text-gray-700">
-            {form.deadline || "Not specified yet"}
-          </p>
-        </div>
-
-        {/* Description Preview */}
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold">📝 Description</h2>
-          <p className="text-gray-700">
-            {form.description || "No description added yet"}
-          </p>
+          <div className="mt-4">
+            <h2 className="text-lg font-semibold">💰 Budget</h2>
+            <p className="text-gray-700">
+              {form.budget ? `PKR ${form.budget}` : "Not specified yet"}
+            </p>
+          </div>
+          <div className="mt-4">
+            <h2 className="text-lg font-semibold">📦 Expected Deliverables</h2>
+            <p className="text-gray-700">
+              {form.deliverables || "Not specified yet"}
+            </p>
+          </div>
+          <div className="mt-4">
+            <h2 className="text-lg font-semibold">📅 Deadline</h2>
+            <p className="text-gray-700">
+              {form.deadline || "Not specified yet"}
+            </p>
+          </div>
+          <div className="mt-4">
+            <h2 className="text-lg font-semibold">📝 Description</h2>
+            <p className="text-gray-700">
+              {form.description || "No description added yet"}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

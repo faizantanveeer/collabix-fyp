@@ -1,24 +1,29 @@
 "use client";
 import React from "react";
 
-const Sidebar = ({ role, setSection }: { role: "business" | "influencer"; setSection: (section: string) => void }) => {
-  const menuItems = role === "business"
-    ? ["Dashboard", "Collaborations", "Chat", "Notifications", "Profile"]
-    : ["Dashboard", "Collaborations", "Chat", "Notifications", "Profile"];
+interface SidebarProps {
+  role: string;
+  setActiveSection: (section: string) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ role, setActiveSection }) => {
+  const sections = ["Dashboard", "Collaborations", "Chat", "Notifications", "Profile"];
 
   return (
-    <aside className="w-64 h-screen bg-gray-900 text-white p-5">
-      {/* <h2 className="text-xl font-bold mb-5">Collabix</h2> */}
+    <div className="w-64 bg-gray-900 text-white p-4">
+      <h2 className="text-xl font-semibold mb-4">{role.toUpperCase()} Dashboard</h2>
       <ul>
-        {menuItems.map((item) => (
-          <li key={item} className="py-2 px-3 rounded hover:bg-gray-700 cursor-pointer"
-            onClick={() => setSection(item)}
+        {sections.map((section) => (
+          <li
+            key={section}
+            onClick={() => setActiveSection(section)}
+            className="cursor-pointer p-2 hover:bg-gray-700 transition"
           >
-            {item}
+            {section}
           </li>
         ))}
       </ul>
-    </aside>
+    </div>
   );
 };
 
