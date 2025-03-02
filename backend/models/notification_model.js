@@ -1,35 +1,21 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Define the schema for notifications
-const notificationSchema = new mongoose.Schema(
-  {
-    recipient: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'User',  // Reference to the User model (business or influencer)
-      required: true 
-    },
-    type: { 
-      type: String, 
-      enum: ['collaboration', 'payment', 'message', 'system'],  // Different types of notifications
-      required: true 
-    },
-    message: { 
-      type: String, 
-      required: true  // The content/message of the notification
-    },
-    isRead: { 
-      type: Boolean, 
-      default: false  // Tracks if the notification has been read by the recipient
-    },
-    createdAt: { 
-      type: Date, 
-      default: Date.now  // Timestamp of when the notification was created
-    },
+const notificationSchema = new mongoose.Schema({
+  receiver: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  }, // Influencer
+  sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Business
+  message: { type: String, required: true },
+  status: {
+    type: String,
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
   },
-  { timestamps: true }  // This will automatically add `createdAt` and `updatedAt` fields
-);
+  read: { type: Boolean, default: false },
+  },
+  { timestamps: true });
 
-// Index to optimize queries by recipient and read status
-notificationSchema.index({ recipient: 1, isRead: 1 });
-
-module.exports = mongoose.model('Notification', notificationSchema);  // Export the Notification model
+module.exports = mongoose.model("Notification", notificationSchema); // Export the Notification model

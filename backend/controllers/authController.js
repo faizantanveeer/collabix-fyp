@@ -1,37 +1,49 @@
+const express = require('express')
 const userModel = require("../models/user_model");
+var router = express.Router();
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // LOGIN HANDLER
 const loginHandler = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
-    }
-
-    // Find user by email
     const loginUser = await userModel.findOne({ email });
+
     if (!loginUser) {
-      return res.status(404).json({ message: "User not found. Please sign up." });
+      return res.status(404).json({ message: "No User Found! Sign Up" });
     }
 
-    // Directly compare passwords
-    if (loginUser.password !== password) {
-      return res.status(400).json({ message: "Incorrect email or password" });
-    }
+    const isMatch = await bcrypt.compare(password, loginUser.password);
 
-    // Return user data directly
-    return res.status(200).json({
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect Email/Password!" });
+    }
+    // Generate JWT
+    const token = jwt.sign({ email}, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+   // Store token in HTTP-only cookie
+   res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",  
+    sameSite: "Strict",
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+  });
+  // console.log(token)
+
+    return res.json({
       id: loginUser._id,
       email: loginUser.email,
       name: loginUser.name,
       role: loginUser.role,
-      password: loginUser.password, // Returning the password as is
+      token: token,
     });
   } catch (error) {
-    console.error("Login Error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.log(error);
+    return res.status(500).send(error.message);
   }
 };
 

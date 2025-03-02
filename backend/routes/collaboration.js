@@ -4,17 +4,20 @@ const router = express.Router();
 // Import controller functions for collaborations
 const { 
   createCollaboration, 
+  sendCollaborationRequest,
   getCollaborations, 
   updateCollaborationStatus 
 } = require("../controllers/collaborationController");
 
 // Route to create a new collaboration
-router.post("/", createCollaboration);
+// router.post("/", createCollaboration);
+
+router.post('/request', sendCollaborationRequest)
 
 // Route to get all collaborations (can add filtering as needed)
-router.get("/", getCollaborations);
+// router.get("/", getCollaborations);
 
 // Route to update collaboration status (e.g., accepted, declined)
-router.put("/:id/status", updateCollaborationStatus);
+// router.put("/:id/status", updateCollaborationStatus);
 
 module.exports = router;

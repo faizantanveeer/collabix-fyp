@@ -1,75 +1,113 @@
 const Collaboration = require("../models/collaboration_model");
+const Notification = require("../models/notification_model");
+const User = require("../models/user_model");
 
-// Create a new collaboration
 const createCollaboration = async (req, res) => {
   try {
-    const { business, influencer, campaign, startDate, endDate, budget } = req.body;
+    const { influencerId, message, budget } = req.body; // Business sends request
+    const businessId = req.user._id; // Business user (from JWT)
 
-    // Ensure all required fields are provided
-    if (!business || !influencer || !campaign || !startDate || !endDate || !budget) {
-      return res.status(400).json({ error: "All fields are required" });
+    if (!influencerId) {
+      return res.status(400).json({ message: "Influencer ID is required" });
     }
 
-    // Create a new collaboration instance
-    const newCollaboration = new Collaboration({
-      business,
-      influencer,
-      campaign,
-      startDate,
-      endDate,
+    // Check if influencer exists
+    const influencer = await User.findById(influencerId);
+    if (!influencer) {
+      return res.status(404).json({ message: "Influencer not found" });
+    }
+
+    // Create a new collaboration request
+    const collabRequest = new Collaboration({
+      business: businessId,
+      influencer: influencerId,
+      message,
       budget,
-      status: "pending",  // Default status for new collaborations
+      status: "pending",
+    });
+    await collabRequest.save();
+
+    // Create a notification for the influencer
+    const notification = new Notification({
+      recipient: influencerId,
+      message: `New collaboration request from ${req.user.name}`,
+      type: "collaboration_request",
+    });
+    await notification.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Collaboration request sent successfully",
+      collaboration: collabRequest,
+      notification,
+    });
+  } catch (error) {
+    console.error("Collaboration Request Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+const sendCollaborationRequest = async(req, res) => {
+  try {
+    const { influencerId,businessId, message } = req.body;
+
+    const collabRequest = new Collaboration({
+      business: businessId,
+      influencer: influencerId,
+      message,
+      status: "pending",
     });
 
-    // Save the new collaboration
-    await newCollaboration.save();
-
-    return res.status(201).json({ message: "Collaboration created successfully", collaboration: newCollaboration });
+    await collabRequest.save();
+    res.status(201).json({ success: true, message: "Collaboration request sent!" });
   } catch (error) {
-    console.error("Error creating collaboration:", error);
-    return res.status(500).json({ error: "Failed to create collaboration" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
-};
+}
 
-// Get all collaborations (can be filtered based on user role or other criteria)
-const getCollaborations = async (req, res) => {
+
+const respondToCollabRequest = async (req, res) => {
   try {
-    const collaborations = await Collaboration.find()
-      .populate("business", "name")   // Populate business name
-      .populate("influencer", "name") // Populate influencer name
-      .exec();
-      
-    return res.status(200).json(collaborations);
-  } catch (error) {
-    console.error("Error fetching collaborations:", error);
-    return res.status(500).json({ error: "Failed to fetch collaborations" });
-  }
-};
+    const { status } = req.body; // "accepted" or "rejected"
+    const collaborationId = req.params.id;
+    const influencerId = req.user._id;
 
-// Update collaboration status (e.g., accepted, declined)
-const updateCollaborationStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    // Validate that the status is one of the predefined values
-    const validStatuses = ["pending", "accepted", "declined", "completed"];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ message: "Invalid status provided" });
-    }
-
-    // Find the collaboration and update its status
-    const collaboration = await Collaboration.findByIdAndUpdate(id, { status }, { new: true });
-
+    // Check if Collaboration exists
+    const collaboration = await Collaboration.findById(collaborationId);
     if (!collaboration) {
-      return res.status(404).json({ message: "Collaboration not found" });
+      return res.status(404).json({ message: "Collaboration request not found" });
     }
 
-    return res.status(200).json({ message: "Collaboration status updated successfully", collaboration });
+    // Ensure only the influencer can respond
+    if (collaboration.influencer.toString() !== influencerId.toString()) {
+      return res.status(403).json({ message: "Unauthorized action" });
+    }
+
+    // Update status
+    collaboration.status = status;
+    await collaboration.save();
+
+    // Create Notification for Business
+    const notification = new Notification({
+      recipient: collaboration.business,
+      message: `Your collaboration request was ${status} by ${req.user.name}`,
+      type: "collab_response"
+    });
+
+    await notification.save();
+
+    res.json({
+      success: true,
+      message: `Collaboration request ${status}`,
+      collaboration,
+      notification
+    });
   } catch (error) {
-    console.error("Error updating collaboration status:", error);
-    return res.status(500).json({ error: "Failed to update collaboration status" });
+    console.error("Collaboration Response Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-module.exports = { createCollaboration, getCollaborations, updateCollaborationStatus };
+
+module.exports = { createCollaboration ,sendCollaborationRequest, respondToCollabRequest};

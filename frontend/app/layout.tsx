@@ -1,20 +1,23 @@
-"use client"
+"use client";
 
 import { SessionProvider } from "next-auth/react";
-import "../styles/globals.css"; // Import global styles if needed
+import "../styles/globals.css"; // Import global styles
+import { NotificationProvider } from "../components/Notification";
+import { SocketProvider } from "../context/socketContext";
 
 export default function RootLayout({
   children,
-  // you can access the session if needed here
 }: {
   children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body>
-        {/* Wrap the app with SessionProvider */}
+        {/* Wrap the entire app with authentication and notifications */}
         <SessionProvider>
-          {children}
+          <SocketProvider>
+            <NotificationProvider>{children}</NotificationProvider>
+          </SocketProvider>
         </SessionProvider>
       </body>
     </html>

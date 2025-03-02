@@ -7,10 +7,16 @@ const Notification = require("../models/notification_model");
 // Get dashboard data based on user role
 const dashboardHandler = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!req.user || !req.user.email) {
+      return res.status(401).json({ message: "Unauthorized access" }); // ✅ Return immediately
     }
+
+    const user = await User.findOne({ email: req.user.email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User profile not found" }); // ✅ Return immediately
+    }
+
 
     let dashboardData = {};
 
@@ -26,7 +32,9 @@ const dashboardHandler = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(5);
 
-    let collaborationsPromise, paymentsPromise;
+      let collaborationsPromise = Promise.resolve([]); // Default empty array
+      let paymentsPromise = Promise.resolve([]); 
+      
     if (role === "influencer") {
       // Fetch influencer-specific data
       collaborationsPromise = Collaboration.find({ influencer: _id })
@@ -50,10 +58,10 @@ const dashboardHandler = async (req, res) => {
       messagesPromise,
       notificationsPromise,
     ]);
-
-    const pendingCollaborations = collaborations.filter((c) => c.status === "pending");
-    const activeCollaborations = collaborations.filter((c) => c.status === "accepted");
-    const completedCollaborations = collaborations.filter((c) => c.status === "completed");
+    const pendingCollaborations = collaborations ? collaborations.filter((c) => c.status === "pending") : [];
+    const activeCollaborations = collaborations ? collaborations.filter((c) => c.status === "accepted") : [];
+    const completedCollaborations = collaborations ? collaborations.filter((c) => c.status === "completed") : [];
+    
 
     dashboardData = {
       profile: {
@@ -82,6 +90,7 @@ const dashboardHandler = async (req, res) => {
       paymentMethods: role === "influencer" ? user.influencerDetails?.paymentMethods : user.businessDetails?.paymentMethods || [],
     };
 
+    // console.log(dashboardData)
     res.json(dashboardData);
   } catch (error) {
     console.error("Dashboard Error:", error);

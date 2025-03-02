@@ -10,7 +10,7 @@ export default function Hero() {
 
     <div className="relative z-10 text-center p-8 max-w-5xl">
       <h1 className=" text-9xl md:text-8xl font-semibold mb-6 leading-tight">
-        Colab. Connect. Convert.
+        Connect Influencer, one click away
       </h1>
       <p className="font-Sagace text-lg max-w-xl mx-auto mb-8">
         Collabix connects businesses with the right influencers—boost your
@@ -18,7 +18,7 @@ export default function Hero() {
       </p>
 
       <div className="flex justify-center gap-4">
-        <Link href="/signup">
+        <Link href="/influencer">
           <button
             type="submit"
             className="text-gray-900 flex justify-center gap-2 items-center mx-auto shadow-xl text-lg bg-gray-50 backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-gray-900 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-2 overflow-hidden border-2 rounded-full group"

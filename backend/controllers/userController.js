@@ -3,9 +3,14 @@ const User = require("../models/user_model");
 // Fetch user profile
 const getUserProfile = async (req, res) => {
   try {
-    const userProfile = await User.findById(req.user.id).select("-password");
+    if (!req.user || !req.user.email) {
+      return res.status(401).json({ message: "Unauthorized access" }); // ✅ Return immediately
+    }
+
+    const userProfile = await User.findOne({ email: req.user.email });
+
     if (!userProfile) {
-      return res.status(404).json({ message: "User profile not found" });
+      return res.status(404).json({ message: "User profile not found" }); // ✅ Return immediately
     }
 
     const profileData = {
@@ -13,27 +18,18 @@ const getUserProfile = async (req, res) => {
       name: userProfile.name,
       email: userProfile.email,
       role: userProfile.role,
-      location: userProfile.location,
-      bio: userProfile.bio,
-      niche: userProfile.niche,
-      kycVerified: userProfile.kycVerified,
-      verified: userProfile.verified,
-      socialLinks: userProfile.socialLinks,
-      totalFollowers: userProfile.totalFollowers,
-      averageRating: userProfile.averageRating,
-      portfolio: userProfile.portfolio,
-      paymentMethods:
-        userProfile.role === "influencer"
-          ? userProfile.influencerDetails?.paymentMethods
-          : userProfile.businessDetails?.paymentMethods,
+      ...(userProfile.role === "influencer" && { influencerDetails: userProfile.influencerDetails }),
+      ...(userProfile.role === "business" && { businessDetails: userProfile.businessDetails }),
     };
 
-    return res.status(200).json({ success: true, data: profileData });
+    return res.status(200).json({ data: profileData }); // ✅ Ensure single response
+
   } catch (error) {
     console.error("Error fetching user profile:", error);
-    return res.status(500).json({ success: false, error: "Internal Server Error" });
+    return res.status(500).json({ error: "Server error" }); // ✅ Ensure single response
   }
 };
+
 
 // Update user profile
 const updateProfile = async (req, res) => {

@@ -1,21 +1,52 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import InfluencerDashboard from "@/components/InfluencerDashboard";
-import BusinessDashboard from "@/components/BusinessDashboard";
+import InfluencerDashboard from "../dashboard/influencer/page";
+import BusinessDashboard from "../dashboard/business/page";
+import { UserData } from "../types";  // Import instead of local interface
+import Navbar from "@/components/Navbar";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
+  const [userData, setUserData] = useState<UserData | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    console.log("Session:", session);
+  const fetchUserProfile = async () => {
+    // console.log("Access Token:", session?.accessToken);
 
+    const res = await fetch("http://localhost:5000/dashboard", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session?.accessToken}`, // Send token
+      },
+      credentials: "include", // Send cookies automatically
+    });
+
+
+    const data = await res.json();
+    console.log("User Data:", data.profile.name);
+    console.log(userData);
+
+
+
+    setUserData(data);
+
+  };
+
+  useEffect(() => {
+    
+    
     if (status === "loading") return; // Wait for session to load
     if (!session?.user) {
       router.push("/login");
+    }
+    
+    if (status === "authenticated") {
+      fetchUserProfile();
+      console.log("Session:", session);
     }
   }, [session, status, router]);
 
@@ -29,12 +60,14 @@ export default function Dashboard() {
   const userRole = session.user.role?.toLowerCase();
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Welcome, {session.user.name}</h1>
+    <div className="">
+
+      <Navbar/>
+      
       {userRole === "influencer" ? (
-        <InfluencerDashboard />
+        <InfluencerDashboard userData={userData} />
       ) : userRole === "business" ? (
-        <BusinessDashboard />
+        <BusinessDashboard userData={userData} />
       ) : (
         <UnknownRole />
       )}

@@ -1,11 +1,15 @@
 const express = require("express");
-const authenticateUser = require("../middleware/isLoggedIn");
+const {isLoggedIn} = require("../middleware/isLoggedIn");
 const router = express.Router();
 
 // Import route handlers
 const authRouter = require("./auth");
 const userRoutes = require("./user");
 const { dashboardHandler } = require("../controllers/dashboardController");
+const influencerRoutes = require("./influencer")
+const collaborationRoutes = require('./collaboration')
+
+
 
 // Home route
 router.get("/", (req, res) => {
@@ -18,12 +22,17 @@ router.get("/home", (req, res) => {
 });
 
 // Dashboard route (protected by authentication)
-router.get("/dashboard", authenticateUser, dashboardHandler);
+router.get("/dashboard", isLoggedIn, dashboardHandler);
 
 // Authentication routes
 router.use("/auth", authRouter);
 
+router.use("/influencers", influencerRoutes);
+
 // User-related routes
-router.use("/user", authenticateUser, userRoutes);
+router.use("/user", isLoggedIn, userRoutes);
+
+router.use('/collaboration', collaborationRoutes)
+
 
 module.exports = router;
