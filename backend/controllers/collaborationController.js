@@ -110,8 +110,26 @@ const getCollaborationInfluencer = async (req, res) => {
   }
 };
 
+const deleteCollaboration = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedCollaboration = await Collaboration.findByIdAndDelete(id);
+
+    if (!deletedCollaboration) {
+      return res.status(404).json({ message: "Collaboration request not found" });
+    }
+
+    return res.status(200).json({ message: "Collaboration request deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting collaboration:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   createCollaboration,
   statusHandler,
   getCollaborationInfluencer,
+  deleteCollaboration
 };

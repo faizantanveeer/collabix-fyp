@@ -1,9 +1,11 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+
 
 const ITEMS_PER_PAGE = 12;
 
@@ -16,6 +18,7 @@ interface Influencer {
 }
 
 export default function InfluencersPage() {
+
   const [influencers, setInfluencers] = useState<Influencer[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -44,7 +47,9 @@ export default function InfluencersPage() {
 
   return (
     <>
+      
       <Navbar />
+
 
       <div className="container mx-auto p-6">
         <h1 className="text-3xl font-bold text-center mb-6">Top Influencers</h1>

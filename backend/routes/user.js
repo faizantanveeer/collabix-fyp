@@ -2,24 +2,17 @@ const express = require("express");
 const router = express.Router();
 const {
   getUserProfile,
-  updateProfile,
-  updatePaymentMethods,
-  deleteUserAccount, // Ensure this is imported
+  updateProfileImage,
 } = require("../controllers/userController");
 const isLoggedIn = require("../middleware/isLoggedIn");
+const upload = require("../utils/multer");
+const User = require("../models/user_model");
+
+router.post("/profile/upload/:id", upload.single("profileImage"), updateProfileImage);
+
+// Get user profile with stats and social links
+router.get("/profile/:id", getUserProfile);
 
 
-
-
-// Get user profile
-router.get("/profile", getUserProfile);
-// Update user profile
-// router.put("/profile", isLoggedIn, updateProfile);
-
-// Update payment methods
-// router.put("/payment-methods", isLoggedIn, updatePaymentMethods);
-
-// Delete user account
-// router.delete("/delete", isLoggedIn, deleteUserAccount); // Ensure this is defined
 
 module.exports = router;

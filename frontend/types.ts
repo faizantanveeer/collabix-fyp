@@ -25,5 +25,7 @@ export interface UserData {
     socialLinks: any[];
     totalFollowers: number;
     website: string;
+    profileImage?: string;
+    image?: string;
   };
 } 

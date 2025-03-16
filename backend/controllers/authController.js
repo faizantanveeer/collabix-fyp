@@ -63,27 +63,30 @@ const signupHandler = async (req, res) => {
       return res.status(400).json({ error: "User already exists" });
     }
 
-    // Create new user (store password as plaintext)
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create new user with hashed password
     const newUser = new userModel({
       name,
       email,
-      password, // Store password as plaintext
+      password: hashedPassword,
       role,
       ...(role === "influencer" && { influencerDetails }),
       ...(role === "business" && { businessDetails }),
     });
 
     // Save user to database
-    await newUser.save();
+    const savedUser = await newUser.save();
 
-    // Return success response with user data
+    // Return success response with user data (excluding password)
     return res.status(201).json({
       message: "User created successfully",
-      id: newUser._id,
-      email: newUser.email,
-      name: newUser.name,
-      role: newUser.role,
-      password: newUser.password, // Returning the password as is
+      id: savedUser._id,
+      email: savedUser.email,
+      name: savedUser.name,
+      role: savedUser.role
     });
   } catch (err) {
     console.error("Signup Error:", err);

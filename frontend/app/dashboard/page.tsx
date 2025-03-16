@@ -18,10 +18,10 @@ export default function Dashboard() {
 
     const res = await fetch("http://localhost:5000/dashboard", {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session?.accessToken}`, // Send token
-      },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.accessToken}`, // Send token
+        },
       credentials: "include", // Send cookies automatically
     });
 
