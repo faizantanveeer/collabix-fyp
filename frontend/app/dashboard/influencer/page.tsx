@@ -16,14 +16,19 @@ interface InfluencerDashboardProps {
 
 export default function InfluencerDashboard({ userData }: InfluencerDashboardProps) {
   const [activeSection, setActiveSection] = useState("Dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar state
 
   return (
     <div className="flex h-screen">
-      {/* Sidebar remains fixed */}
-      <Sidebar role="influencer" setActiveSection={setActiveSection} />
+      {/* Sidebar - Controlled by isSidebarOpen */}
+      <Sidebar role="influencer" setActiveSection={setActiveSection} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      {/* Right Side Content - Updates dynamically */}
-      <main className="flex-1 p-5 h-full overflow-y-auto">
+      {/* Main Content - Adjusts margin dynamically */}
+      <main
+        className={`flex-1 p-5 h-full overflow-y-auto transition-all duration-300
+          ${isSidebarOpen ? "md:ml-0 ml-0" : "ml-16 md:ml-0"}
+        `}
+      >
         {activeSection === "Dashboard" && <Dashboard userData={userData} />}
         {activeSection === "Collaborations" && (
           <Suspense fallback={<div>Loading...</div>}>

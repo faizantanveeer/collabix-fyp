@@ -91,7 +91,7 @@ const LandingPage = () => {
 
       {/* Call to Action Section */}
       <section className="py-20 bg-gray-900 text-white text-center">
-        <h1 className=" text-9xl md:text-8xl font-semibold mb-6 leading-tight">
+      <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold mb-6 leading-tight">
           Where Collaboration Meets Impact.
         </h1>
         <Link href="/signup">

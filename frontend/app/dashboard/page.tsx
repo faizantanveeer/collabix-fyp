@@ -59,17 +59,15 @@ export default function Dashboard() {
   const userRole = session.user.role?.toLowerCase();
 
   return (
-    <div className="h-full">
+    <div className="h-screen overflow-y-hidden">
       <Navbar />
 
       {/* <InfluencerDashboard userData={userData} /> */}
       {userRole === "influencer" ? (
         <InfluencerDashboard userData={userData} />
-      ) : userRole === "business" ? (
+      ) :  (
         <BusinessDashboard userData={userData} />
-      ) : (
-        <UnknownRole />
-      )}
+      ) }
     </div>
   );
 }

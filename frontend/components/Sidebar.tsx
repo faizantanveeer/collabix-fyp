@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -14,11 +14,12 @@ import {
 interface SidebarProps {
   role: string;
   setActiveSection: (section: string) => void;
+  isOpen: boolean; // Controlled from the parent
+  setIsOpen: (state: boolean) => void; // State updater from the parent
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ role, setActiveSection }) => {
+const Sidebar: React.FC<SidebarProps> = ({ role, setActiveSection, isOpen, setIsOpen }) => {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(true); // Sidebar open/close state
 
   const sections = [
     { name: "Dashboard", icon: <LayoutDashboard /> },
@@ -29,18 +30,18 @@ const Sidebar: React.FC<SidebarProps> = ({ role, setActiveSection }) => {
   ];
 
   return (
-    <div className="flex">
-      {/* Sidebar - Fixed for Mobile, Relative for Desktop */}
+    <div>
+      {/* Sidebar - Fixed on mobile, relative on larger screens */}
       <div
-        className={`bg-gray-900 text-white p-4 transition-all duration-300
-          ${isOpen ? "w-64" : "w-16"} min-h-screen flex flex-col fixed md:relative z-50`}
+        className={`bg-gray-900 text-white p-4 transition-all duration-300 fixed md:relative z-50
+          ${isOpen ? "w-64" : "w-16"} min-h-screen flex flex-col
+        `}
       >
         {/* Toggle Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="absolute top-1/2 right-[-14px] bg-gray-900 p-2 rounded-full shadow-lg z-50 transform -translate-y-1/2"
         >
-          {/* Blinking Effect */}
           <div className="relative">
             <span className="absolute inset-0 w-full h-full animate-ping bg-gray-600 rounded-full opacity-75"></span>
             {isOpen ? (
@@ -53,9 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, setActiveSection }) => {
 
         {/* Sidebar Content */}
         {isOpen && (
-          <h2 className="text-xl font-semibold mb-4 p-3">
-            {role.toUpperCase()} Dashboard
-          </h2>
+          <h2 className="text-xl font-semibold mb-4 p-3">{role.toUpperCase()} Dashboard</h2>
         )}
 
         <ul className="mt-4 space-y-2">
@@ -80,8 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({ role, setActiveSection }) => {
           ))}
         </ul>
       </div>
-
-      
     </div>
   );
 };
