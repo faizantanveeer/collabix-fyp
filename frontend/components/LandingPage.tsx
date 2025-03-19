@@ -9,7 +9,6 @@ import Hero from "./Hero";
 const LandingPage = () => {
   const [showScrollEffect, setShowScrollEffect] = useState(false);
 
-
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -25,11 +24,10 @@ const LandingPage = () => {
 
   return (
     <div>
-      <Hero />      
+      <Hero />
 
       {/* How It Works Section */}
       <section className="py-20 bg-gray-50 text-gray-900">
-
         <div className="text-center mb-12">
           <h2 className="text-3xl font-medium mb-6">How Collabix Works</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -52,7 +50,7 @@ const LandingPage = () => {
               opportunities.
             </p>
           </div>
-          <div className="p-8 max-w-xs  rounded-xl shadow-sm hover:scale-105 transition-all duration-300 ease-in-out hover:shadow-xl" >
+          <div className="p-8 max-w-xs  rounded-xl shadow-sm hover:scale-105 transition-all duration-300 ease-in-out hover:shadow-xl">
             <h3 className="text-2xl font-medium mb-4">
               <DotLottieReact
                 src="https://lottie.host/822bc22e-f82a-40eb-b6d4-1aa483ec1246/5WbnKYPWhi.lottie"
@@ -86,12 +84,11 @@ const LandingPage = () => {
 
       <Features />
 
-
       <Testimonials />
 
       {/* Call to Action Section */}
       <section className="py-20 bg-gray-900 text-white text-center">
-      <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold mb-6 leading-tight">
+        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold mb-6 leading-tight">
           Where Collaboration Meets Impact.
         </h1>
         <Link href="/signup">
@@ -117,7 +114,14 @@ const LandingPage = () => {
       {/* Footer */}
       <footer className="py-6 bg-gray-900 text-white text-center">
         <p>&copy; 2025 Collabix. All Rights Reserved.</p>
-        <div className="mt-4">
+        <div className="mt-4 gap-7 flex items-center justify-center">
+          <Link href="/contact" className="mr-4 hover:text-gray-400">
+            Influencer
+          </Link>
+
+          <Link href="/dashboard" className="hover:text-gray-400">
+            Dashboard
+          </Link>
           <Link href="/contact" className="mr-4 hover:text-gray-400">
             Contact
           </Link>
