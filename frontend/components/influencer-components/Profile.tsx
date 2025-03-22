@@ -225,7 +225,7 @@ const Profile = ({ userData }: ProfileProps) => {
             <p className="text-gray-600">Average Rating</p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-2xl font-bold">{profileData.industry}</p>
+            <p className="text-2xl font-bold">{profileData.nich}</p>
             <p className="text-gray-600">Industry</p>
           </div>
         </div>

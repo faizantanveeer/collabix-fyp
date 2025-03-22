@@ -215,7 +215,7 @@ const InfluencerDashboard = ({ userData }: DashboardProps) => {
               <List className="w-5 h-5" />
               View All Collaborations
             </motion.button>
-            
+              
             <motion.button 
               whileHover={{ scale: 1.02, backgroundColor: "rgb(243 244 246)" }}
               className="w-full p-3 text-left rounded-lg flex items-center gap-3 hover:bg-gray-50 transition-colors"
