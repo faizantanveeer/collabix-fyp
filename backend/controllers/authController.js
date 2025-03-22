@@ -94,10 +94,53 @@ const signupHandler = async (req, res) => {
   }
 };
 
+
+
+const googleLoginHandler = async (req, res) => {
+  const { name, email, image, googleId } = req.body;
+
+  console.log(name, email, image, googleId)
+
+  try {
+    const user = await userModel.findOne({ email }); 
+    if (!user) {
+      const user = new userModel({
+        name,
+        email,
+        profileImage: image,
+        googleId,
+        isGoogleUser: true, // important!
+        role: 'influencer'
+      });
+    
+      const newUser =  await user.save()
+
+      console.log("New User: ",newUser)
+      const token = jwt.sign({ id: newUser._id,}, process.env.JWT_SECRET);
+
+
+    
+      return res.status(200).json({ user: newUser, token });
+    }
+    
+    const token = jwt.sign({ email }, process.env.JWT_SECRET);
+    res.status(200).json({ user, token });
+
+
+
+    
+  } catch (error) {
+    console.error("Google signup error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
 // LOGOUT HANDLER
 const logoutHandler = (req, res) => {
   // Since no token/cookie is being used, we can just send a logout success message
   return res.status(200).json({ message: "Logged out successfully" });
 };
 
-module.exports = { loginHandler, signupHandler, logoutHandler };
+
+module.exports = { loginHandler, signupHandler, logoutHandler ,googleLoginHandler};

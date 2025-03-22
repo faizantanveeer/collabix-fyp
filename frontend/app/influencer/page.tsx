@@ -4,7 +4,14 @@ import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Heart, Search, Filter, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react"; // Better back icon
+import {
+  Heart,
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
+} from "lucide-react"; // Better back icon
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {Skeleton} from "@/components/ui/skeleton"; 
+import { Skeleton } from "@/components/ui/skeleton";
 import ChatbotWidget from "@/components/Chatbot";
 
 const ITEMS_PER_PAGE = 12;
@@ -96,7 +103,10 @@ export default function InfluencersPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Back to Influencers Button */}
         <div className="mb-4">
-          <Link href="/" className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition"
+          >
             <ArrowLeft size={20} />
             <span className="text-lg font-semibold">Back to Home</span>
           </Link>
@@ -129,7 +139,7 @@ export default function InfluencersPage() {
             />
 
             <Select value={selectedNiche} onValueChange={setSelectedNiche}>
-            <SelectTrigger className="w-full pl-10">
+              <SelectTrigger className="w-full pl-10">
                 <SelectValue placeholder="Select a niche" />
               </SelectTrigger>
               <SelectContent>
@@ -147,21 +157,29 @@ export default function InfluencersPage() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
-              <div key={index} className="w-full h-60 bg-gray-300 dark:bg-gray-700 rounded-xl animate-pulse"></div>
-
+              <div
+                key={index}
+                className="w-full h-60 bg-gray-300 dark:bg-gray-700 rounded-xl animate-pulse"
+              ></div>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {visibleInfluencers.map((influencer) => (
-              <Card key={influencer.id} className="relative bg-white/30 dark:bg-gray-900/40 shadow-xl backdrop-blur-lg rounded-xl overflow-hidden transition-transform hover:-translate-y-2 hover:shadow-2xl">
+              <Card
+                key={influencer.id}
+                className="relative bg-white/30 dark:bg-gray-900/40 shadow-xl backdrop-blur-lg rounded-xl overflow-hidden transition-transform hover:-translate-y-2 hover:shadow-2xl"
+              >
                 <Link href={`/influencer/${influencer.id}`} className="block">
                   <Image
                     src={
-                      influencer.image &&
-                      !influencer.image.startsWith("/images/")
-                        ? `http://localhost:5000/uploads/profiles/${influencer.image}`
-                        : "/images/placeholder.png"
+                      influencer.image
+                        ? influencer.image.startsWith("http")
+                          ? influencer.image // ✅ Google or any direct image URL
+                          : influencer.image.startsWith("/images/")
+                          ? influencer.image // ✅ Local static placeholder
+                          : `http://localhost:5000/uploads/profiles/${influencer.image}` // ✅ Uploaded profile
+                        : "/images/placeholder.png" // ✅ Fallback
                     }
                     alt={influencer.name}
                     width={300}
@@ -176,20 +194,30 @@ export default function InfluencersPage() {
                 >
                   <Heart
                     size={24}
-                    className={favorites.includes(influencer.id) ? "fill-red-500 text-red-500" : "text-gray-400"}
+                    className={
+                      favorites.includes(influencer.id)
+                        ? "fill-red-500 text-red-500"
+                        : "text-gray-400"
+                    }
                   />
                 </button>
 
                 <CardContent className="p-4 text-center">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">{influencer.name}</h2>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">{influencer.niche}</p>
-                  <p className="text-blue-500 font-bold mt-2">{influencer.followers} Followers</p>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+                    {influencer.name}
+                  </h2>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    {influencer.niche}
+                  </p>
+                  <p className="text-blue-500 font-bold mt-2">
+                    {influencer.followers} Followers
+                  </p>
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
-        <ChatbotWidget/>
+        <ChatbotWidget />
       </div>
     </>
   );

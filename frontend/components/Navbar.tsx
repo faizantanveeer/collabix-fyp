@@ -29,6 +29,7 @@ export function Navbar() {
 
   useEffect(() => {
     if (session?.user?.id) {
+      // console.log(session)
       fetchProfileData();
     }
   }, [session]);
@@ -70,6 +71,8 @@ export function Navbar() {
     <nav className="flex justify-between items-center px-6 py-4 shadow-md bg-white text-gray-900 relative">
       {/* Logo */}
       <Link href="/" className="text-2xl font-bold  text-gray-900 flex justify-center items-center">
+        
+        
         <Image
           src={"/images/logo.png"}
           alt={"Logo"}
@@ -106,10 +109,10 @@ export function Navbar() {
               className="hidden md:flex items-center gap-2 focus:outline-none"
             >
               <img
-                src={
+                 src={
                   profileData?.profileImage
-                    ? `http://localhost:5000/uploads/profiles/${profileData.profileImage}`
-                    : "/images/placeholder.png"
+                    ? profileData?.profileImage
+                    : "/images/placeholder.png" // ✅ Fallback
                 }
                 alt="Profile"
                 className="w-10 h-10 rounded-full object-cover border p-1 cursor-pointer"

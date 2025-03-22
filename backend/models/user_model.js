@@ -4,12 +4,27 @@ const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: function () {
+        // Only require password if not using Google login
+        return !this.isGoogleUser;
+      }
+    },
+    isGoogleUser: {
+      type: Boolean,
+      default: false
+    },
+    
     role: { type: String, enum: ["business", "influencer"], required: true },
     profileImage: { type: String },
     bio: { type: String },
     niche: { type: String },
     location: { type: String },
+    googleId: {
+      type: String,
+      unique: true,
+    },
 
     // Social Media & Analytics
     socialLinks: [

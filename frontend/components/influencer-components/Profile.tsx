@@ -176,9 +176,16 @@ const Profile = ({ userData }: ProfileProps) => {
         <div className="flex flex-col items-center">
           <div className="relative">
             <img
-              src={profileData.profileImage 
-                ? `http://localhost:5000/uploads/profiles/${profileData.profileImage}` 
-                : "/images/placeholder.png"}  
+              src={
+                
+                profileData.profileImage
+                  ? profileData.profileImage.startsWith("http")
+                    ? profileData.profileImage // ✅ Google or any direct image URL
+                    : profileData.profileImage.startsWith("/images/")
+                    ? profileData.profileImage // ✅ Local static placeholder
+                    : `http://localhost:5000/uploads/profiles/${profileData.profileImage}` // ✅ Uploaded profile
+                  : "/images/placeholder.png" // ✅ Fallback
+              }
               alt="Profile"
               className="w-32 h-32 rounded-full border-4 border-primary object-cover"
             />
