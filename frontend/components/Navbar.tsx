@@ -88,7 +88,7 @@ export function Navbar() {
         <Link href="/influencer">
           <Button variant="ghost" className="text-1xl">Influencers</Button>
         </Link>
-        <Link href="/businesses">
+        <Link href="/business">
           <Button variant="ghost" className="text-1xl">Businesses</Button>
         </Link>
         <Link href="/contact">
@@ -192,7 +192,7 @@ export function Navbar() {
               <Users size={18} /> Influencers
             </Button>
           </Link>
-          <Link href="/businesses" onClick={() => setMobileMenuOpen(false)}>
+          <Link href="/business" onClick={() => setMobileMenuOpen(false)}>
             <Button
               variant="ghost"
               className="w-full text-left flex items-center gap-2"

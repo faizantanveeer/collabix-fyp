@@ -129,7 +129,7 @@ const Collaborations = ({ userData }: CollaborationsProps) => {
   const rejectedRequests = requests.filter((r) => r.status === "rejected");
 
   return (
-    <div className="max-w-6xl mx-auto mt-8 space-y-8">
+    <div className="max-w-6xl mx-auto mt-4 mb-14 pb-8 space-y-8">
       <div className="flex flex-col items-center gap-4">
         <h2 className="text-3xl font-bold text-center">
           Collaboration Requests

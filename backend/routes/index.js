@@ -8,6 +8,7 @@ const collaborationRoutes = require('./collaboration');
 const userRoutes = require('./user');
 const { dashboardHandler } = require("../controllers/dashboardController");
 const influencerRoutes = require("./influencer")
+const chatbotRoutes = require('./chatbot')
 
 
 
@@ -34,5 +35,6 @@ router.use('/user', userRoutes);
 
 router.use('/collaboration', collaborationRoutes)
 
+router.use('/chatbot', chatbotRoutes)
 
 module.exports = router;

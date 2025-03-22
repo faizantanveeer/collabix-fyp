@@ -1,7 +1,7 @@
 import { Session } from "next-auth";
 import { UserData } from "../../types";
 import useSWR from "swr";
-import { Loader2, DollarSign, Users, Clock, CheckCircle, BarChart2, Settings, HelpCircle, List } from "lucide-react";
+import { Loader2, DollarSign, Users, Clock, CheckCircle, BarChart2, Settings, HelpCircle, List, Link } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface DashboardProps {
@@ -56,7 +56,7 @@ const InfluencerDashboard = ({ userData }: DashboardProps) => {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="p-8 bg-gradient-to-br from-gray-50 to-gray-100"
+      className="p-8 bg-gradient-to-br from-gray-50 to-gray-100 mb-16"
     >
       {/* Stats Overview */}
       <motion.div 
@@ -206,13 +206,16 @@ const InfluencerDashboard = ({ userData }: DashboardProps) => {
             <h3 className="text-lg font-semibold">Quick Actions</h3>
           </div>
           <div className="mt-4 space-y-3">
+            
             <motion.button 
               whileHover={{ scale: 1.02, backgroundColor: "rgb(243 244 246)" }}
+              
               className="w-full p-3 text-left rounded-lg flex items-center gap-3 hover:bg-gray-50 transition-colors"
-            >
+              >
               <List className="w-5 h-5" />
               View All Collaborations
             </motion.button>
+            
             <motion.button 
               whileHover={{ scale: 1.02, backgroundColor: "rgb(243 244 246)" }}
               className="w-full p-3 text-left rounded-lg flex items-center gap-3 hover:bg-gray-50 transition-colors"

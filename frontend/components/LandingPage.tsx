@@ -5,6 +5,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import Features from "./FeatureSection";
 import Testimonials from "./Testimonial";
 import Hero from "./Hero";
+import Chatbot from "@/components/Chatbot";
 
 const LandingPage = () => {
   const [showScrollEffect, setShowScrollEffect] = useState(false);
@@ -130,6 +131,7 @@ const LandingPage = () => {
           </Link>
         </div>
       </footer>
+      <Chatbot />
     </div>
   );
 };

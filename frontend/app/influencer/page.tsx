@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton"; 
+import ChatbotWidget from "@/components/Chatbot";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -188,6 +189,7 @@ export default function InfluencersPage() {
             ))}
           </div>
         )}
+        <ChatbotWidget/>
       </div>
     </>
   );
