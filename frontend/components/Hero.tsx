@@ -1,64 +1,58 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { motion } from "framer-motion";
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 export default function Hero() {
-  return (
-    <section className="relative flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 bg-[#0a0e17] text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#1a1f2e,#0a0e17)] opacity-80"></div>
+	return (
+		<section className="back-image bg-cover bg-center min-h-screen w-full flex flex-col sm:block justify-center items-center sm:items-start">
+			<div className="py-20 sm:py-24 lg:py-32 px-4 w-full">
+				<div className="ml-0 sm:ml-16 flex flex-col justify-center items-center sm:items-start w-full sm:max-w-xl text-center sm:text-left mx-auto">
+					<div>
+						<h1 className="text-white text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 leading-tight">
+							<span className="real font-extralight text-white">
+								Real&nbsp;
+							</span>
+							Creators.
+							<br />
+							<span className="real font-extralight text-white">
+								Real&nbsp;
+							</span>
+							Impact.
+						</h1>
+					</div>
 
-      <div className="relative z-10 text-center max-w-5xl w-full px-4">
-      <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold mb-6 leading-tight">
-        Connect Influencer, one click away
-      </h1>
-      <p className="font-Sagace text-lg max-w-xl mx-auto mb-8">
-        Collabix connects businesses with the right influencers—boost your
-        brand, maximize impact, and turn influence into revenue.
-      </p>
+					<p className="text-muted-foreground font-Sagace text-base sm:text-lg md:text-xl max-w-xl mx-auto sm:mx-0 mb-8">
+						Brands meet bold creators. No middlemen. No cringe.
+					</p>
 
-      <div className="flex flex-col sm:flex-row justify-center gap-4">
-        <Link href="/influencer">
-          <button
-            type="submit"
-            className="text-gray-900 flex justify-center gap-2 items-center mx-auto shadow-xl text-lg bg-gray-50 backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-gray-900 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-2 overflow-hidden border-2 rounded-full group"
-          >
-            Connect to Influencer
-            <svg
-              className="w-8 h-8 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full border border-gray-700 group-hover:border-none p-2 rotate-45"
-              viewBox="0 0 16 19"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
-                className="fill-gray-800 group-hover:fill-gray-800"
-              ></path>
-            </svg>
-          </button>
-        </Link>
+					<div className="flex flex-col sm:flex-row justify-center sm:justify-start items-center gap-4 w-full max-w-md sm:max-w-none">
+						<Link href="/influencer" className="w-full sm:w-auto">
+							<button
+								type="button"
+								className="w-full sm:w-auto group relative z-10 px-6 py-2 border border-white rounded-full text-white font-semibold text-base lg:text-lg backdrop-blur-md shadow-md overflow-hidden"
+							>
+								<span className="relative z-10 transition duration-300 group-hover:text-gray-900">
+									Explore Creators
+								</span>
+								<span className="absolute bottom-[-40%] left-1/2 w-[200%] h-[200%] bg-white rounded-[50%] scale-y-0 group-hover:scale-y-100 transition-transform duration-500 ease-in-out origin-bottom translate-x-[-50%] z-0" />
+							</button>
+						</Link>
 
-        <Link href="/signup">
-          <button
-            type="submit"
-            className="text-gray-900 flex justify-center gap-2 items-center mx-auto shadow-xl text-lg bg-gray-50 backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-gray-900 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-2 overflow-hidden border-2 rounded-full group"
-          >
-            Become an Influencer
-            <svg
-              className="w-8 h-8 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full border border-gray-700 group-hover:border-none p-2 rotate-45"
-              viewBox="0 0 16 19"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
-                className="fill-gray-800 group-hover:fill-gray-800"
-              ></path>
-            </svg>
-          </button>
-        </Link>
-      </div>
-
-
-    </div>
-  </section>
-  );
+						<Link href="/login" className="w-full sm:w-auto">
+							<button
+								type="button"
+								className="w-full sm:w-auto group relative z-10 px-6 py-2 border border-white rounded-full text-white font-semibold text-base lg:text-lg backdrop-blur-md shadow-md overflow-hidden"
+							>
+								<span className="relative z-10 transition duration-300 group-hover:text-gray-900">
+									Get Started
+								</span>
+								<span className="absolute bottom-[-40%] left-1/2 w-[200%] h-[200%] bg-white rounded-[50%] scale-y-0 group-hover:scale-y-100 transition-transform duration-500 ease-in-out origin-bottom translate-x-[-50%] z-0" />
+							</button>
+						</Link>
+					</div>
+				</div>
+			</div>
+		</section>
+	);
 }
