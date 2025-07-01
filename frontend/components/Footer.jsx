@@ -4,7 +4,7 @@ import React from 'react';
 function Footer() {
 	return (
 		<div className="bg-[url('https://img.freepik.com/premium-photo/dot-pattern-png-transparent-background_53876-974532.jpg')] bg-repeat bg-[length:150px] bg-center">
-			<footer className="bg-gradient-to-t from-gray-800 to-gray-900 text-white rounded-t-3xl mt-24">
+			<footer className="  bg-gradient-to-t from-gray-800 to-gray-900 text-white rounded-t-3xl mt-24">
 				{/* Top CTA Box */}
 				<div className="relative -top-16 z-10 px-4">
 					<div className="bg-white text-zinc-900 rounded-3xl shadow-xl border-2 border-gray-900 max-w-4xl mx-auto px-6 py-10 md:py-20 flex flex-col md:flex-row items-center justify-center text-center gap-6 relative overflow-hidden">

@@ -31,6 +31,8 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [scrolled, setScrolled] = useState(false);
 
+	const textColor = scrolled || !isDark ? 'text-gray-900' : 'text-white';
+
 	useEffect(() => {
 		if (session?.user?.id) {
 			// console.log(session)
@@ -124,11 +126,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 						<Link key={i} href={href}>
 							<Button
 								variant="link"
-								className={`text-lg hover:no-underline transition-colors duration-300 ${
-									scrolled || !isDark
-										? 'text-gray-900'
-										: 'text-white'
-								}`}
+								className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
 							>
 								{
 									[
@@ -259,7 +257,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 						>
 							<Button
 								variant="ghost"
-								className="w-full text-left flex items-center gap-2"
+								className="w-full text-left flex items-center gap-2 text-gray-900"
 							>
 								<LayoutDashboard size={18} /> Dashboard
 							</Button>
@@ -270,7 +268,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 						>
 							<Button
 								variant="ghost"
-								className="w-full text-left flex items-center gap-2"
+								className="w-full text-left flex items-center gap-2 text-gray-900"
 							>
 								<Users size={18} /> Influencers
 							</Button>
@@ -281,7 +279,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 						>
 							<Button
 								variant="ghost"
-								className="w-full text-left flex items-center gap-2"
+								className="w-full text-left flex items-center gap-2 text-gray-900"
 							>
 								<DollarSign size={18} /> Pricing
 							</Button>
@@ -292,7 +290,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 						>
 							<Button
 								variant="ghost"
-								className="w-full text-left flex items-center gap-2"
+								className="w-full text-left flex items-center gap-2 text-gray-900"
 							>
 								<Users size={18} /> Meet Our Team
 							</Button>
@@ -309,7 +307,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 								>
 									<Button
 										variant="ghost"
-										className="w-full text-left flex items-center gap-2 mt-4"
+										className={`w-full text-left flex items-center gap-2 mt-4 text-gray-900`}
 									>
 										<User size={18} /> Profile
 									</Button>
@@ -317,7 +315,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 								<Button
 									onClick={() => signOut()}
 									variant="ghost"
-									className="w-full text-left flex items-center gap-2 hover:text-red-500"
+									className={`w-full text-left flex items-center gap-2 mt-4 text-gray-900`}
 								>
 									<LogOut size={18} /> Log Out
 								</Button>
@@ -330,7 +328,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 								>
 									<Button
 										variant="ghost"
-										className="w-full text-left flex items-center gap-2 mt-4"
+										className={`w-full text-left flex items-center gap-2 mt-4 text-gray-900`}
 									>
 										<LogIn size={18} /> Log In
 									</Button>
@@ -341,7 +339,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 								>
 									<Button
 										variant="ghost"
-										className="w-full text-left flex items-center gap-2"
+										className={`w-full text-left flex items-center gap-2 text-gray-900`}
 									>
 										<UserPlus size={18} /> Sign Up
 									</Button>

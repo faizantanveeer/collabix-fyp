@@ -100,3 +100,43 @@ export const collabixStats = [
 		icon: '/images/icons/reach.png',
 	},
 ];
+
+export const pricingCards = [
+	{
+		title: 'For Brands',
+		description:
+			'Post your campaign, get pitches from dope creators, seal the deal — then we take 2%. That’s it. No cap.',
+		features: [
+			'Free to Post a Campaign',
+			'Choose from Verified Creators',
+			'Pay Only When You Finalize',
+			'100% Transparency, No Hidden Fees',
+		],
+		icon: '/images/icons/briefcase.png',
+	},
+
+	{
+		title: 'For Creators',
+		description:
+			'Pick your price, pitch brands, and secure the bag. We only take 2% after you do your magic. You keep 98%.',
+		features: [
+			'Keep 98% of What You Earn',
+			'Unlimited Pitches',
+			'Build Your Portfolio While You Earn',
+			'Zero Entry Fees, Zero Stress',
+		],
+		icon: '/images/icons/influencer.png',
+	},
+	{
+		title: 'Our Cut',
+		description:
+			'We ain’t greedy. If your deal’s $500, we get $10. Just enough to keep the lights on and the vibes high.',
+		features: [
+			'Only Charged on Successful Deals',
+			'Lowest Platform Fee in the Game',
+			'Simple Math: You Earn = We Earn',
+			'Full Breakdown in Every Transaction',
+		],
+		icon: '/images/icons/dollar.png',
+	},
+];
