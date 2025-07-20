@@ -2,6 +2,7 @@ import Providers from './provider';
 import { Toaster } from '@/components/ui/sonner';
 import '../styles/globals.css'; // Import global styles
 import Head from 'next/head';
+import NProgressProvider from '@/components/NProgressProvider';
 
 export default function RootLayout({
 	children,
@@ -18,6 +19,7 @@ export default function RootLayout({
 				<Providers>
 					{' '}
 					{/* Wrap with Providers */}
+					<NProgressProvider />
 					{children}
 					<Toaster richColors position="top-center" />
 				</Providers>

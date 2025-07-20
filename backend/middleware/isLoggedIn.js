@@ -1,40 +1,98 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const User = require('../models/user_model'); // Adjust the path as needed
 
 const isLoggedIn = (req, res, next) => {
-  let token = req.cookies.token; // First check cookies
+	// Check cookie first
+	const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
-  // If token not in cookies, check Authorization header
-  if (!token && req.headers.authorization) {
-    const authHeader = req.headers.authorization.split(" ");
-    if (authHeader[0] === "Bearer" && authHeader[1]) {
-      token = authHeader[1]; // Extract token from Bearer token
-    }
-  }
+	if (!token) {
+		return res
+			.status(401)
+			.json({ message: 'Unauthorized access. No token provided.' });
+	} else {
+	}
 
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized access. No token provided." });
-  }
+	try {
+		const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET); // Use same secret as NextAuth
 
-  // console.log("Received Token:", token);
-
-  try {
-    const verified = jwt.verify(token.trim(), process.env.JWT_SECRET);
-    req.user = verified; // Attach decoded user to req.user
-    next();
-  } catch (err) {
-    return res.status(403).json({ message: "Invalid or expired token" });
-  }
+		req.user = decoded;
+		console.log('Decoded user:', req.user);
+		next();
+	} catch (err) {
+		return res.status(403).json({ message: 'Invalid or expired token.' });
+	}
 };
 
-const restrictToBusiness = (req, res, next) => {
-  if (req.user.role !== "business") {
-    return res.status(403).json({
-      error: "Only businesses can perform this action! Sign Up first instead",
-    });
-  }
-  next();
+const businessOnly = async (req, res, next) => {
+	try {
+		const token = req.headers.authorization?.split(' ')[1];
+
+		if (!token) {
+			return res
+				.status(401)
+				.json({ message: 'Unauthorized: No token provided' });
+		}
+
+		const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+		const userEmail = decoded.email;
+
+		const user = await User.findOne({ email: userEmail });
+
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
+		}
+
+		if (user.role !== 'business') {
+			return res.status(403).json({
+				message:
+					'Access denied: Only businesses can perform this action',
+			});
+		}
+
+		req.user = user; // attach full user object if needed in routes
+		next();
+	} catch (error) {
+		console.error('Authorization error:', error);
+		return res
+			.status(500)
+			.json({ message: 'Server error during authorization' });
+	}
 };
 
-module.exports = { isLoggedIn, restrictToBusiness };
+const influencerOnly = async (req, res, next) => {
+	try {
+		const token = req.headers.authorization?.split(' ')[1];
+
+		if (!token) {
+			return res
+				.status(401)
+				.json({ message: 'Unauthorized: No token provided' });
+		}
+
+		const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
+		const userEmail = decoded.email;
+
+		const user = await User.findOne({ email: userEmail });
+
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
+		}
+
+		if (user.role !== 'influencer') {
+			return res.status(403).json({
+				message:
+					'Access denied: Only influencers can perform this action',
+			});
+		}
+
+		req.user = user; // attach full user object if needed in routes
+		next();
+	} catch (error) {
+		console.error('Authorization error:', error);
+		return res
+			.status(500)
+			.json({ message: 'Server error during authorization' });
+	}
+};
+
+module.exports = { isLoggedIn, businessOnly, influencerOnly };

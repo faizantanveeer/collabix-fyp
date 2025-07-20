@@ -116,30 +116,74 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 				</Link>
 
 				{/* Desktop Navigation */}
-				<div className="hidden md:flex gap-6">
-					{[
-						'/dashboard',
-						'/influencer',
-						'/pricing',
-						'/meet-our-team',
-					].map((href, i) => (
-						<Link key={i} href={href}>
-							<Button
-								variant="link"
-								className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
-							>
-								{
-									[
-										'Dashboard',
-										'Influencers',
-										'Pricing',
-										'Meet Our Team',
-									][i]
-								}
-							</Button>
-						</Link>
-					))}
-				</div>
+
+				{session ? (
+					<>
+						<div className="hidden md:flex gap-6">
+							<Link href="/">
+								<Button
+									variant="link"
+									className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
+								>
+									Home
+								</Button>
+							</Link>
+							<Link href="/dashboard">
+								<Button
+									variant="link"
+									className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
+								>
+									Dashboard
+								</Button>
+							</Link>
+							<Link href="/influencer">
+								<Button
+									variant="link"
+									className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
+								>
+									Influencers
+								</Button>
+							</Link>
+							<Link href="/dashboard">
+								<Button
+									variant="link"
+									className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
+								>
+									Manage Gigs
+								</Button>
+							</Link>
+						</div>
+					</>
+				) : (
+					<>
+						<div className="hidden md:flex gap-6">
+							{[
+								'/',
+								'/gigs',
+								'/influencer',
+								'/pricing',
+								// '/meet-our-team',
+							].map((href, i) => (
+								<Link key={i} href={href}>
+									<Button
+										variant="link"
+										className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
+									>
+										{
+											[
+												'Home',
+												'Explore Gigs',
+												'Influencers',
+												'Pricing',
+												// 'Meet Our Team',
+											][i]
+										}
+									</Button>
+								</Link>
+							))}
+						</div>
+					</>
+				)}
 
 				{/* Profile / Auth Section */}
 				<div className="flex items-center gap-4">
@@ -152,25 +196,36 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 								onClick={() => setDropdownOpen(!dropdownOpen)}
 								className="flex items-center gap-2 focus:outline-none"
 							>
-								<img
+								<Image
 									src={
-										profileData?.profileImage ||
-										'/images/placeholder.png'
+										profileData?.profileImage
+											? profileData.profileImage.startsWith(
+													'http'
+											  )
+												? profileData.profileImage
+												: profileData.profileImage.startsWith(
+														'/images/'
+												  )
+												? profileData.profileImage
+												: `http://localhost:5000/uploads/profiles/${profileData.profileImage}`
+											: '/images/placeholder.png'
 									}
 									alt="Profile"
 									className="w-10 h-10 rounded-full object-cover border p-1 cursor-pointer"
+									width={40}
+									height={40}
 								/>
 							</button>
 							{dropdownOpen && (
 								<div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md overflow-hidden z-50">
 									<Link href="/profile">
-										<div className="flex items-center gap-2 px-4 py-2 hover:bg-gray-200 hover:text-black cursor-pointer transition-colors">
+										<div className="flex items-center gap-2 px-4 py-2 hover:bg-gray-200 hover:text-black cursor-pointer transition-colors font-medium">
 											<User size={18} /> Profile
 										</div>
 									</Link>
 									<button
 										onClick={() => signOut()}
-										className="w-full text-left flex items-center gap-2 px-4 py-2 hover:bg-gray-200 hover:text-red-500 cursor-pointer transition-colors"
+										className="w-full text-left flex items-center gap-2 px-4 py-2 hover:bg-gray-200 hover:text-red-500 cursor-pointer transition-colors font-medium"
 									>
 										<LogOut size={18} /> Log Out
 									</button>

@@ -5,10 +5,17 @@ import { NextAuthOptions, User } from "next-auth";
 interface ExtendedUser extends User {
   _id?: string;
   token?: string;
-  role?: string;
+  role: string;
 }
 
 const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET, // Must match backend
+  session: {
+    strategy: "jwt",
+  },
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -18,21 +25,29 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
+          if (!credentials || !credentials.email || !credentials.password) {
+            console.error("Auth Error: Missing credentials");
+            return null;
+          }
           const res = await fetch("http://localhost:5000/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(credentials),
             credentials: "include",
           });
-
           const user = await res.json();
 
-          if (!res.ok || !user._id) {
+          if (!res.ok || !user.id) {
             console.error("Auth Error:", user.message || "Invalid credentials");
             return null;
           }
 
-          return user as ExtendedUser;
+          // Ensure role is always defined
+          return {
+            ...user,
+            _id: user.id, // or _id: user.id if you want to normalize
+            role: user.role || "influencer",
+          } as ExtendedUser;
         } catch (error) {
           console.error("Auth Error:", error);
           return null;
@@ -75,11 +90,11 @@ const authOptions: NextAuthOptions = {
               googleId: profile.sub,
             }),
           });
-    
+
           const data = await res.json();
-    
+
           if (res.ok && data.user) {
-                
+
             token.id = data.user._id;
             token.email = data.user.email;
             token.role = data.user.role || "influencer";
@@ -87,38 +102,37 @@ const authOptions: NextAuthOptions = {
           } else {
             console.error("❌ Google user saving failed:", data);
           }
-    
+
           // console.log("Google login backend response:", data);
         } catch (err) {
           console.error("Google login error:", err);
         }
       }
-    
+
       // ✅ Credentials Login
       if (user && '_id' in user) {
         const u = user as ExtendedUser;
-    
-        
-    
+
+
+
         token.id = u._id;
         token.email = u.email;
         token.role = u.role || "influencer";
         token.accessToken = u.token || token.accessToken; // keep fallback
       }
-    
+
       return token;
     },
-    
+
 
     async session({ session, token }) {
       session.user.id = token.id as string;
       session.user.email = token.email as string;
       session.user.role = (token.role as string) || "influencer";
       session.accessToken = token.accessToken;
-    
-      // console.log("JWT Token:", token);
-      // console.log("Session:", session);
-    
+
+
+
       return session;
     },
   },

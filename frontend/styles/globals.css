@@ -162,3 +162,12 @@ h2 {
 	background-position: center;
 	background-repeat: no-repeat;
 }
+
+#nprogress .bar {
+	background: #ff0000; /* YouTube red */
+	height: 3px;
+}
+
+#nprogress .peg {
+	box-shadow: 0 0 10px #ff0000, 0 0 5px #ff0000;
+}

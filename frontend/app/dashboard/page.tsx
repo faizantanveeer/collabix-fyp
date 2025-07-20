@@ -1,73 +1,73 @@
-"use client";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+'use client';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import InfluencerDashboard from "../dashboard/influencer/page";
-import BusinessDashboard from "../dashboard/business/page";
-import { UserData } from "../../types";
-import Navbar from "@/components/Navbar";
+import InfluencerDashboard from '../dashboard/influencer/page';
+import BusinessDashboard from '../dashboard/business/page';
+import { UserData } from '../../types';
+import Navbar from '@/components/Navbar';
+import { PulseLoader } from 'react-spinners';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
 export default function Dashboard() {
-  const { data: session, status } = useSession();
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const router = useRouter();
+	const { data: session, status } = useSession();
+	const [userData, setUserData] = useState<UserData | null>(null);
+	const router = useRouter();
 
-  const fetchUserProfile = async () => {
-    // console.log("Access Token:", session?.accessToken);
+	const fetchUserProfile = async () => {
+		const res = await fetch('http://localhost:5000/dashboard', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${session?.accessToken}`, // Send token
+			},
+			credentials: 'include', // Send cookies automatically
+		});
 
-    const res = await fetch("http://localhost:5000/dashboard", {
-      method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.accessToken}`, // Send token
-        },
-      credentials: "include", // Send cookies automatically
-    });
+		const data = await res.json();
 
-    const data = await res.json();
-    
-    // console.log(userData);
+		// console.log(userData);
 
+		setUserData(data);
+	};
 
-    setUserData(data);
-  };
+	useEffect(() => {
+		// Start or stop NProgress based on status
+		if (status === 'loading') {
+			NProgress.start();
+		} else {
+			NProgress.done();
+		}
 
-  useEffect(() => {
-    if (status === "loading") return; // Wait for session to load
-    if (!session?.user) {
-      router.push("/login");
-    }
+		// Redirect to login if not authenticated
+		if (!session?.user && status !== 'loading') {
+			router.push('/login');
+		}
 
-    if (status === "authenticated") {
-      fetchUserProfile();
-      // console.log("Session:", session);
-    }
-  }, [session, status, router]);
+		// Fetch profile only when authenticated
+		if (status === 'authenticated') {
+			fetchUserProfile();
+		}
+	}, [session, status, router]);
 
-  if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center h-screen text-xl">
-        Loading...
-      </div>
-    );
-  }
+	if (!session?.user) return null; // Avoid rendering if user is not logged in
 
-  if (!session?.user) return null; // Avoid rendering if user is not logged in
+	// Convert role to lowercase
+	const userRole = session.user.role?.toLowerCase();
 
-  // Convert role to lowercase
-  const userRole = session.user.role?.toLowerCase();
-
-  return (
-    <div className="h-screen overflow-y-hidden">
-      <Navbar />
-
-      {/* <InfluencerDashboard userData={userData} /> */}
-      {userRole === "influencer" ? (
-        <InfluencerDashboard userData={userData} />
-      ) :  (
-        <BusinessDashboard userData={userData} />
-      ) }
-    </div>
-  );
+	return (
+		<div className="h-screen overflow-y-hidden">
+			<Navbar theme="light" />
+			<div className="mt-16">
+				{/* <InfluencerDashboard userData={userData} /> */}
+				{userRole === 'influencer' ? (
+					<InfluencerDashboard userData={userData} />
+				) : (
+					<BusinessDashboard userData={userData} />
+				)}
+			</div>
+		</div>
+	);
 }

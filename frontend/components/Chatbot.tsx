@@ -84,17 +84,17 @@ export default function ChatbotWidget() {
 				{/* Pulsating Circle */}
 				<div className="relative flex items-center justify-center">
 					{/* Pulse ring */}
-					<div className="absolute w-20 h-20 rounded-full bg-gray-800 opacity-50 animate-ping"></div>
+					<div className="absolute w-12 h-12 rounded-full bg-gray-800 opacity-50 animate-ping transition "></div>
 
 					{/* Chat Button */}
 					<button
 						onClick={toggleChat}
-						className="relative z-10 w-20 h-20 bg-white border border-gray-300 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+						className="relative z-10 w-12 h-12 bg-white border border-gray-300 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
 					>
 						<img
 							src="/images/logob.png" // ✅ Ensure this path is correct
 							alt="Chatbot Icon"
-							className="w-20 h-20 object-contain"
+							className="w-12 h-12 object-cover"
 						/>
 					</button>
 				</div>
