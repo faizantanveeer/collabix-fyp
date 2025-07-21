@@ -114,6 +114,8 @@ const deleteCollaboration = async (req, res) => {
 
 		const deletedCollaboration = await Collaboration.findByIdAndDelete(id);
 
+		console.log(`Collaboration with ID ${id} deleted:`, deletedCollaboration);
+
 		if (!deletedCollaboration) {
 			return res
 				.status(404)

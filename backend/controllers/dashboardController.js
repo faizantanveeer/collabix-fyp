@@ -8,7 +8,6 @@ const Review = require('../models/review_model'); // Add Review model import
 // Get dashboard data based on user role
 const dashboardHandler = async (req, res) => {
 	try {
-		console.log('Dashboard request received:', req.user);
 		if (!req.user || !req.user.email) {
 			return res.status(401).json({ message: 'Unauthorized access' }); // ✅ Return immediately
 		}

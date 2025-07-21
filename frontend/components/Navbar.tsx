@@ -17,6 +17,15 @@ import {
 	Briefcase,
 	Mail,
 	DollarSign,
+	Home,
+	HomeIcon,
+	Grid3x3,
+	FileText,
+	ListChecks,
+	ClipboardList,
+	Group,
+	UserRound,
+	Handshake,
 } from 'lucide-react';
 
 export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
@@ -144,7 +153,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 									Influencers
 								</Button>
 							</Link>
-							<Link href="/dashboard">
+							<Link href="/gigs">
 								<Button
 									variant="link"
 									className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
@@ -289,13 +298,14 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 				</div>
 
 				{/* Mobile Navigation Menu */}
+
 				<div
 					className={`fixed top-0 right-0 h-screen w-64 bg-white shadow-lg transform ${
 						mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
 					} transition-transform duration-300 md:hidden z-40`}
 				>
 					<div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-						<span className="text-xl mt-3 font-semibold text-gray-900">
+						<span className="text-xl  font-semibold text-gray-900">
 							Menu
 						</span>
 						<button
@@ -304,56 +314,108 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 							aria-label="Close Menu"
 						></button>
 					</div>
-
-					<div className="flex flex-col gap-3 px-6 mt-4">
-						<Link
-							href="/dashboard"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							<Button
-								variant="ghost"
-								className="w-full text-left flex items-center gap-2 text-gray-900"
-							>
-								<LayoutDashboard size={18} /> Dashboard
-							</Button>
-						</Link>
-						<Link
-							href="/influencer"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							<Button
-								variant="ghost"
-								className="w-full text-left flex items-center gap-2 text-gray-900"
-							>
-								<Users size={18} /> Influencers
-							</Button>
-						</Link>
-						<Link
-							href="/pricing"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							<Button
-								variant="ghost"
-								className="w-full text-left flex items-center gap-2 text-gray-900"
-							>
-								<DollarSign size={18} /> Pricing
-							</Button>
-						</Link>
-						<Link
-							href="/meet-our-team"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							<Button
-								variant="ghost"
-								className="w-full text-left flex items-center gap-2 text-gray-900"
-							>
-								<Users size={18} /> Meet Our Team
-							</Button>
-						</Link>
-					</div>
+					{session ? (
+						<>
+							<div className="flex flex-col gap-3 px-6 mt-4 mb-4">
+								<Link
+									href="/"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<Button
+										variant="ghost"
+										className="w-full text-left flex items-center gap-2 text-gray-900"
+									>
+										<HomeIcon size={18} /> Home
+									</Button>
+								</Link>
+								<Link
+									href="/dashboard"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<Button
+										variant="ghost"
+										className="w-full text-left flex items-center gap-2 text-gray-900"
+									>
+										<LayoutDashboard size={18} /> Dashboard
+									</Button>
+								</Link>
+								<Link
+									href="/influencer"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<Button
+										variant="ghost"
+										className="w-full text-left flex items-center gap-2 text-gray-900"
+									>
+										<Users size={18} /> Influencers
+									</Button>
+								</Link>
+								<Link
+									href="/gigs"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<Button
+										variant="ghost"
+										className="w-full text-left flex items-center gap-2 text-gray-900"
+									>
+										<ClipboardList size={18} /> Manage Gigs
+									</Button>
+								</Link>
+							</div>
+						</>
+					) : (
+						<>
+							<div className="flex flex-col gap-3 px-6 mt-4 mb-4">
+								<Link
+									href="/dashboard"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<Button
+										variant="ghost"
+										className="w-full text-left flex items-center gap-2  text-gray-900"
+									>
+										<LayoutDashboard size={18} /> Dashboard
+									</Button>
+								</Link>
+								<Link
+									href="/influencer"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<Button
+										variant="ghost"
+										className="w-full text-left flex items-center gap-2  text-gray-900"
+									>
+										<Users size={18} /> Influencers
+									</Button>
+								</Link>
+								<Link
+									href="/pricing"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<Button
+										variant="ghost"
+										className="w-full text-left flex items-center gap-2  text-gray-900"
+									>
+										<DollarSign size={18} /> Pricing
+									</Button>
+								</Link>
+								<Link
+									href="/meet-our-team"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<Button
+										variant="ghost"
+										className="w-full text-left flex items-center gap-2 text-gray-900"
+									>
+										<Handshake size={18} /> Meet Our Team
+									</Button>
+								</Link>
+							</div>
+						</>
+					)}
 
 					{/* Auth Section in Mobile */}
-					<div className="mt-4 px-6 border-t">
+					<div className=" px-6 border-t">
 						{session ? (
 							<>
 								<Link
@@ -364,13 +426,13 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 										variant="ghost"
 										className={`w-full text-left flex items-center gap-2 mt-4 text-gray-900`}
 									>
-										<User size={18} /> Profile
+										<UserRound size={18} /> Profile
 									</Button>
 								</Link>
 								<Button
 									onClick={() => signOut()}
 									variant="ghost"
-									className={`w-full text-left flex items-center gap-2 mt-4 text-gray-900`}
+									className={`w-full text-left flex items-center gap-2 mt-2 text-gray-900`}
 								>
 									<LogOut size={18} /> Log Out
 								</Button>
@@ -383,7 +445,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 								>
 									<Button
 										variant="ghost"
-										className={`w-full text-left flex items-center gap-2 mt-4 text-gray-900`}
+										className={`w-full text-left flex items-center gap-2 text-gray-900`}
 									>
 										<LogIn size={18} /> Log In
 									</Button>

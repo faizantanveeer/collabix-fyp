@@ -16,7 +16,6 @@ const isLoggedIn = (req, res, next) => {
 		const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET); // Use same secret as NextAuth
 
 		req.user = decoded;
-		console.log('Decoded user:', req.user);
 		next();
 	} catch (err) {
 		return res.status(403).json({ message: 'Invalid or expired token.' });
