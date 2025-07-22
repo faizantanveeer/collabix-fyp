@@ -168,7 +168,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 						<div className="hidden md:flex gap-6">
 							{[
 								'/',
-								'/gigs',
+								'/explore_gigs',
 								'/influencer',
 								'/pricing',
 								// '/meet-our-team',

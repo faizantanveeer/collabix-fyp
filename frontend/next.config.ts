@@ -9,6 +9,12 @@ const nextConfig = {
         pathname: "/uploads/profiles/**",
       },
       {
+        protocol: "http",
+        hostname: "localhost",
+        port: "5000",
+        pathname: "/uploads/**",
+      },
+      {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
         pathname: "/**",

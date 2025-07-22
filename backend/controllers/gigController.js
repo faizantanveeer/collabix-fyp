@@ -1,44 +1,32 @@
 const Gig = require('../models/gig_model');
+const User = require('../models/user_model');
 
 // ✅ Create a new gig
 const createGig = async (req, res) => {
 	try {
-		const { influencer } = req.user; // if using auth middleware
-		const {
-			title,
-			description,
-			price,
-			deliveryTime,
-			revisions,
-			images,
-			category,
-		} = req.body;
+		console.log('REQ BODY:', req.body); // text fields
+		console.log('FILES:', req.files); // uploaded images
 
-		if (!title || !description || !price || !deliveryTime) {
-			return res
-				.status(400)
-				.json({ message: 'All required fields must be filled' });
-		}
+		const { title, description, price, deliveryTime, revisions, category } =
+			req.body;
 
-		const newGig = new Gig({
+		// Parse numbers correctly (since formData sends them as strings)
+		const gig = new Gig({
 			influencer: req.user._id,
 			title,
 			description,
-			price,
-			deliveryTime,
-			revisions,
-			images,
+			price: Number(price),
+			deliveryTime: Number(deliveryTime),
+			revisions: Number(revisions),
 			category,
+			images: req.files.images?.map((file) => `${file.filename}`),
 		});
 
-		await newGig.save();
-		res.status(201).json({
-			message: 'Gig created successfully',
-			gig: newGig,
-		});
+		await gig.save();
+		res.status(201).json({ message: 'Gig created successfully', gig });
 	} catch (error) {
-		console.error('Create Gig Error:', error);
-		res.status(500).json({ message: 'Server error creating gig' });
+		console.error(error);
+		res.status(500).json({ error: 'Gig creation failed' });
 	}
 };
 
@@ -57,7 +45,7 @@ const getAllGigs = async (req, res) => {
 };
 
 // ✅ Get gigs for specific influencer
-const getInfluencerGigs = async (req, res) => {
+const getInfluencerGigsbyId = async (req, res) => {
 	try {
 		const { id } = req.params;
 		const gigs = await Gig.find({ influencer: id });
@@ -68,8 +56,36 @@ const getInfluencerGigs = async (req, res) => {
 	}
 };
 
+const getInfluencerGigs = async (req, res) => {
+	try {
+		if (!req.user || !req.user.email) {
+			return res.status(401).json({ message: 'Unauthorized access' });
+		}
+		console.log('Fetching gigs for user:', req.user.email);
+
+		const user = await User.findOne({ email: req.user.email });
+
+		if (!user) {
+			return res.status(404).json({ message: 'User profile not found' });
+		}
+
+		console.log('User found:', user);
+
+		const userId = user._id;
+		const gigs = await Gig.find({ influencer: userId }).sort({
+			createdAt: -1,
+		});
+
+		res.status(200).json({ gigs });
+	} catch (err) {
+		console.error('Error fetching influencer gigs:', err);
+		res.status(500).json({ error: 'Server Error' });
+	}
+};
+
 module.exports = {
 	createGig,
 	getAllGigs,
 	getInfluencerGigs,
+	getInfluencerGigsbyId,
 };

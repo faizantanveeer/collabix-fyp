@@ -70,5 +70,4 @@ export const dashboardSidebar = {
 export const manageGigSidebar = [
 	{ label: 'My Gigs', href: '/gigs', icon: <Briefcase /> },
 	{ label: 'Create New', href: '/gigs/new', icon: <LayoutDashboard /> },
-	{ label: 'Earnings', href: '/gigs/earnings', icon: <Settings /> },
 ];

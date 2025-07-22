@@ -9,11 +9,13 @@ const isLoggedIn = (req, res, next) => {
 		return res
 			.status(401)
 			.json({ message: 'Unauthorized access. No token provided.' });
-	} else {
 	}
+	console.log('Token received:', token);
 
 	try {
 		const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET); // Use same secret as NextAuth
+
+		console.log('decoded token:', decoded);
 
 		req.user = decoded;
 		next();

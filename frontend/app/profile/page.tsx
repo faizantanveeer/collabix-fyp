@@ -17,6 +17,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import Image from 'next/image';
+import { PulseLoader } from 'react-spinners';
 
 interface SocialLink {
 	platform: string;
@@ -79,7 +80,17 @@ const Profile = () => {
 	}, [token, userId]);
 
 	if (!profileData)
-		return <p className="text-center text-gray-600">Loading profile...</p>;
+		return (
+			<div className="flex items-center justify-center min-h-screen">
+				<p className="text-center text-gray-600">
+					<PulseLoader
+						color="#111827"
+						size={10}
+						speedMultiplier={0.6}
+					/>
+				</p>
+			</div>
+		);
 
 	const handleImageUpload = async (
 		e: React.ChangeEvent<HTMLInputElement>

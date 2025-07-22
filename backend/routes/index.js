@@ -1,5 +1,5 @@
 const express = require('express');
-const { isLoggedIn } = require('../middleware/isLoggedIn');
+const { isLoggedIn, influencerOnly } = require('../middleware/isLoggedIn');
 const router = express.Router();
 
 // Import route handlers
@@ -36,6 +36,6 @@ router.use('/collaboration', isLoggedIn, collaborationRoutes);
 
 router.use('/chatbot', chatbotRoutes);
 
-router.use('/gigs', gigRoutes);
+router.use('/gigs',  gigRoutes);
 
 module.exports = router;
