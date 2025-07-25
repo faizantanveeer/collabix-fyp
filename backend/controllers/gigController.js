@@ -4,9 +4,6 @@ const User = require('../models/user_model');
 // ✅ Create a new gig
 const createGig = async (req, res) => {
 	try {
-		console.log('REQ BODY:', req.body); // text fields
-		console.log('FILES:', req.files); // uploaded images
-
 		const { title, description, price, deliveryTime, revisions, category } =
 			req.body;
 
@@ -44,11 +41,10 @@ const getAllGigs = async (req, res) => {
 	}
 };
 
-// ✅ Get gigs for specific influencer
-const getInfluencerGigsbyId = async (req, res) => {
+const getGigsDatabyId = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const gigs = await Gig.find({ influencer: id });
+		const gigs = await Gig.find({ _id: id });
 		res.json(gigs);
 	} catch (error) {
 		console.error('Get Influencer Gigs Error:', error);
@@ -61,15 +57,12 @@ const getInfluencerGigs = async (req, res) => {
 		if (!req.user || !req.user.email) {
 			return res.status(401).json({ message: 'Unauthorized access' });
 		}
-		console.log('Fetching gigs for user:', req.user.email);
 
 		const user = await User.findOne({ email: req.user.email });
 
 		if (!user) {
 			return res.status(404).json({ message: 'User profile not found' });
 		}
-
-		console.log('User found:', user);
 
 		const userId = user._id;
 		const gigs = await Gig.find({ influencer: userId }).sort({
@@ -83,9 +76,80 @@ const getInfluencerGigs = async (req, res) => {
 	}
 };
 
+const deleteGig = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const gig = await Gig.findById(id);
+
+		if (!gig) {
+			return res.status(404).json({ message: 'Gig not found' });
+		}
+
+		await Gig.findByIdAndDelete(id);
+		res.status(200).json({ message: 'Gig deleted successfully' });
+	} catch (error) {
+		console.error('Delete Gig Error:', error);
+		res.status(500).json({ message: 'Error deleting gig' });
+	}
+};
+
+const editGig = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const gig = await Gig.findById(id);
+		if (!gig) return res.status(404).json({ message: 'Gig not found' });
+
+		const {
+			title,
+			description,
+			price,
+			deliveryTime,
+			revisions,
+			category,
+			isActive,
+		} = req.body;
+
+		// Defensive checks
+		if (
+			!title ||
+			!description ||
+			!price ||
+			!deliveryTime ||
+			!revisions ||
+			!category
+		) {
+			return res.status(400).json({ message: 'Missing required fields' });
+		}
+
+		gig.title = title;
+		gig.description = description;
+		gig.price = Number(price);
+		gig.deliveryTime = Number(deliveryTime);
+		gig.revisions = Number(revisions);
+		gig.category = category;
+		gig.isActive = isActive === 'true' || isActive === true;
+
+		// Handle new image upload
+		if (req.files?.image?.[0]) {
+			gig.images = [req.files.image[0].filename];
+		} else if (req.files?.images) {
+			gig.images = req.files.images.map((file) => file.filename);
+		}
+
+		await gig.save();
+		res.status(200).json({ message: 'Gig updated successfully', gig });
+	} catch (error) {
+		console.error('Edit Gig Error:', error);
+		res.status(500).json({ message: 'Error updating gig' });
+	}
+};
+
 module.exports = {
 	createGig,
 	getAllGigs,
 	getInfluencerGigs,
-	getInfluencerGigsbyId,
+	getGigsDatabyId,
+	deleteGig,
+	editGig,
 };

@@ -119,7 +119,6 @@ const googleLoginHandler = async (req, res) => {
 
 			const newUser = await user.save();
 
-			console.log('New User: ', newUser);
 			const token = jwt.sign(
 				{ id: newUser._id },
 				process.env.NEXTAUTH_SECRET

@@ -64,7 +64,6 @@ export default function CreateGigForm() {
 					formData.append(key, value as any);
 				}
 			});
-            console.log('Form Data:', Object.fromEntries(formData.entries()));
 			const res = await fetch('http://localhost:5000/gigs/create', {
 				method: 'POST',
 				body: formData,
@@ -74,7 +73,6 @@ export default function CreateGigForm() {
 				credentials: 'include',
 			});
 
-			console.log('Response:', res);
 
 			if (!res.ok) throw new Error('Gig creation failed');
 			toast.success('Gig created successfully!');
