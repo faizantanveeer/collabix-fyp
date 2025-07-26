@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import ChatbotWidget from '@/components/Chatbot';
+import ShortFooter from '@/components/ShortFooter';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -224,6 +225,7 @@ export default function InfluencersPage() {
 				)}
 				<ChatbotWidget />
 			</div>
+			<ShortFooter	 />
 		</>
 	);
 }
