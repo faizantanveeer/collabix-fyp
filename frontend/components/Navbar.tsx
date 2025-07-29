@@ -145,6 +145,14 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 									Dashboard
 								</Button>
 							</Link>
+							<Link href="/explore_gigs">
+								<Button
+									variant="link"
+									className={`text-lg hover:no-underline transition-colors duration-300 ${textColor}`}
+								>
+									Explore Gigs
+								</Button>
+							</Link>
 							<Link href="/influencer">
 								<Button
 									variant="link"
@@ -161,6 +169,7 @@ export function Navbar({ theme = 'dark' }: { theme?: 'dark' | 'light' }) {
 									Manage Gigs
 								</Button>
 							</Link>
+							
 						</div>
 					</>
 				) : (

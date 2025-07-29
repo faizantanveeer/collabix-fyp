@@ -30,10 +30,12 @@ const createGig = async (req, res) => {
 // ✅ Get all gigs (for home or explore)
 const getAllGigs = async (req, res) => {
 	try {
-		const gigs = await Gig.find({ isActive: true }).populate(
-			'influencer',
-			'name profileImage'
-		);
+		const gigs = await Gig.find({ isActive: true }).populate('influencer');
+
+		if (!gigs || gigs.length === 0) {
+			return res.status(404).json({ message: 'No gigs found' });
+		}
+
 		res.json(gigs);
 	} catch (error) {
 		console.error('Get All Gigs Error:', error);
@@ -49,6 +51,43 @@ const getGigsDatabyId = async (req, res) => {
 	} catch (error) {
 		console.error('Get Influencer Gigs Error:', error);
 		res.status(500).json({ message: "Error fetching influencer's gigs" });
+	}
+};
+
+const getInfluencerOtherGigs = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const gigs = await Gig.find({ _id: id }).populate('influencer');
+		res.json(gigs);
+	} catch (error) {
+		console.error('Get Influencer Gigs Error:', error);
+		res.status(500).json({ message: "Error fetching influencer's gigs" });
+	}
+};
+
+const exploreMoreGigs = async (req, res) => {
+	try {
+		const { influencerId } = req.query; // Get influencerId from query parameters
+
+		let query = {};
+		if (influencerId) {
+			query.influencer = influencerId;
+		}
+		// You could also add other filters here like category, price range, etc.
+
+		// Find gigs based on the constructed query, and populate the influencer details
+		const gigs = await Gig.find(query).populate('influencer');
+
+		if (!gigs || gigs.length === 0) {
+			return res
+				.status(404)
+				.json({ message: 'No gigs found for the given criteria' });
+		}
+
+		res.status(200).json(gigs); // Return an array of gigs
+	} catch (error) {
+		console.error('Error fetching gigs:', error);
+		res.status(500).json({ message: 'Server error', error: error.message });
 	}
 };
 
@@ -145,6 +184,17 @@ const editGig = async (req, res) => {
 	}
 };
 
+const getIndividualGigData = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const gigs = await Gig.find({ _id: id }).populate('influencer');
+		res.json(gigs);
+	} catch (error) {
+		console.error('Get Influencer Gigs Error:', error);
+		res.status(500).json({ message: "Error fetching influencer's gigs" });
+	}
+};
+
 module.exports = {
 	createGig,
 	getAllGigs,
@@ -152,4 +202,7 @@ module.exports = {
 	getGigsDatabyId,
 	deleteGig,
 	editGig,
+	getIndividualGigData,
+	getInfluencerOtherGigs,
+	exploreMoreGigs,
 };

@@ -5,13 +5,16 @@ import ShortFooter from '@/components/ShortFooter';
 
 const ExploreGigs = () => {
 	return (
-		<div>
+		<div className="min-h-screen flex flex-col">
 			<Navbar theme="light" />
-			<div className="mt-16 max-w-6xl mx-auto">
-				<ExploreGigsPage />
+
+			{/* Main content fills remaining height */}
+			<div className="flex-grow flex flex-col">
+				<ExploreGigsPage  />
 			</div>
-			<ShortFooter/>
-			
+
+			{/* Footer sticks to the bottom */}
+			<ShortFooter />
 		</div>
 	);
 };

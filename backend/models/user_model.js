@@ -113,4 +113,20 @@ userSchema.pre('save', function (next) {
 	next();
 });
 
+userSchema.pre('remove', async function (next) {
+	console.log(`Cascade deleting data for user: ${this._id}`);
+
+	try {
+		// This is the efficient way to delete all gigs by this influencer
+		await mongoose.model('Gig').deleteMany({ influencer: this._id });
+
+		// ... continue with deleting collaborations and reviews as discussed
+
+		next();
+	} catch (error) {
+		console.error('Error during cascade deletion for user:', error);
+		next(error);
+	}
+});
+
 module.exports = mongoose.model('User', userSchema);

@@ -8,6 +8,8 @@ const {
 	getInfluencerGigs,
 	deleteGig,
 	editGig,
+	exploreMoreGigs,
+	getInfluencerOtherGigs,
 } = require('../controllers/gigController');
 const { influencerOnly, isLoggedIn } = require('../middleware/isLoggedIn');
 
@@ -22,10 +24,14 @@ router.get('/all', getAllGigs); // Publicly visible
 
 router.get('/influencer', isLoggedIn, getInfluencerGigs);
 
+router.get('/explore_gigs/:id', getInfluencerOtherGigs);
+
+router.get('/explore_gigs/', exploreMoreGigs)
 
 router.delete('/delete/:id', isLoggedIn, deleteGig);
 
 router.get('/:id', isLoggedIn, getGigsDatabyId);
+
 router.put(
 	'/:id',
 	upload.fields([
